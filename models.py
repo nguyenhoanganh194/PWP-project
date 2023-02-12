@@ -1,36 +1,41 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import MetaData
-from flask.cli import with_appcontext
+import sqlalchemy as sa
 db = SQLAlchemy()
 
-
 class User(db.Model):
-   
+    __tablename__ = "User"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False, unique=True)
     password = db.Column(db.String(64), nullable=False)
-    
-    playlists =  db.relationship("Playlist", cascade="all, delete-orphan",back_populates="of_user")
     #TODO: Define schema here later
 
 
 class Playlist(db.Model):
+    __tablename__ = "Playlist"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     description = db.Column(db.String(256), nullable=False)
     date_created = db.Column(db.String(64), nullable=False, default="descending")
-
-    songs = db.relationship("Song", cascade="all, delete-orphan", back_populates="in_playlist")
-    of_user = db.relationship("User", back_populates="playlists")
+    of_user = db.Column(db.Integer, db.ForeignKey('User.id'))
+    songs = db.relationship("Song", secondary="In_Playlist")
+    
     #TODO: Define schema here later
 
 
 class Song(db.Model):
+    __tablename__ = "Song"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     directory = db.Column(db.Integer, nullable=False)
     genre = db.Column(db.String(19), nullable=False)
-    in_playlist = db.relationship("Playlist", back_populates="songs")
+    of_user = db.Column(db.Integer, db.ForeignKey('User.id'))
+
     #TODO: Define schema here later
 
 
+class In_Playlist(db.Model):
+    __tablename__ = "In_Playlist"
+
+    playlist_id = db.Column(sa.ForeignKey("Playlist.id"), primary_key=True)
+    song_id = db.Column(sa.ForeignKey("Song.id"), primary_key=True)
+    order = db.Column(sa.Integer)
