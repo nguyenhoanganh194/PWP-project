@@ -80,7 +80,7 @@ def add_song(user_id):
 @app.route("/add_to_playlist/<user_id>/<playlist_id>/<song_id>/add/",methods=["POST"])
 def add_song_to_playlist(user_id,playlist_id,song_id):
     user = models.db.session.query(models.User).filter_by(id = user_id).scalar()
-    #check if user exist
+    #check if user, playlist ,song exist try except 
     playlist = models.db.session.query(models.Playlist).filter_by(id = user.id).scalar()
     song = models.db.session.query(models.Playlist).filter_by(id = user.id).scalar()
     if song is not None: 
