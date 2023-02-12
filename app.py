@@ -30,7 +30,7 @@ def add_user():
     try:
         user = models.User(
             id = 12,
-            name = "12",
+            user_name = "12",
             password = "12"
         )
         models.db.session.add(user)
