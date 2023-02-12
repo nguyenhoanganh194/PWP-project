@@ -1,26 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from flask.cli import with_appcontext
-from app import db
+db = SQLAlchemy()
 
 
-
-
-
-@with_appcontext
-def init_db_command():
-    """
-    Initializes a new database.
-    """
-    db.create_all()
-    meta = MetaData(bind=app.db.engine)
-    meta.reflect()
-    # Get a list of table names
-    table_names = meta.tables.keys()
-    print(table_names)
-
-
-class User(app.db.Model):
+class User(db.Model):
    
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False, unique=True)

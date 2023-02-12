@@ -1,28 +1,45 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
+from flask.cli import with_appcontext
 import models
+from models import db
 import random
 
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db = SQLAlchemy(app)
+
+
+with app.app_context():
+    """
+    Initializes a new database.
+    """
+    db.init_app(app)
+    db.create_all()
+    meta = MetaData(bind=db.engine)
+    meta.reflect()
+    # Get a list of table names
+    table_names = meta.tables.keys()
+    print(table_names)
+
  #Test
 @app.route("/user/add/",methods=["POST"])
 def add_user():
-    try:
-        item = models.User(
-            id = random.random(),
-            name = random.random(),
-            password = random.random()
-        )
-        models.db.session.add(item)
-        models.db.session.commit()
-        return "Successful",201
-    except:
-        return "User already exists",409
+    print("Call")
+    
+    print("Call")
+    user = models.User(
+        id = random.random(),
+        name = random.random(),
+        password = random.random()
+    )
+    print("Call")
+    models.db.session.add(user)
+    models.db.session.commit()
+    return "Successful",201
+
 
     
 @app.route("/playlist/<user_id>/add/",methods=["POST"])
@@ -33,7 +50,8 @@ def add_playlist(user_id):
             playlist = models.Playlist(
                 id = random.random(),
                 name = random.random(),
-                description = random.random()
+                description = random.random(),
+                of_user = user
             )
             models.db.session.add(playlist)
             models.db.session.commit()
