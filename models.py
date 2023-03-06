@@ -16,17 +16,17 @@ class User(db.Model):
             "required": ["user_name", "password"]
         }
         props = schema["properties"] = {}
-        props["name"] = {
+        props["user_name"] = {
             "description": "User's name",
             "type": "string",
-            "pattern": "^[a-zA-Z0-9_ ]{1,64}$"
+            "pattern": "^[a-z0-9_]{1,64}$"
         }
         props["password"] = {
             "description": "User's password",
             "type": "string",
-            "pattern": "^[a-fA-F0-9]{32}$"
+            "pattern": "^[a-fA-F0-9]{64}$"
         }
-        return 
+        return schema
 
 class Playlist(db.Model):
     __tablename__ = "Playlist"
