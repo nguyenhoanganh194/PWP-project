@@ -7,18 +7,37 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_name  = db.Column(db.String(64), nullable=False, unique=True)
     password  = db.Column(db.String(64), nullable=False)
-    #TODO: Define schema here later
 
+    playlists = db.relationship("Playlist", cascade="all, delete-orphan", back_populates="user")
+    @staticmethod
+    def get_schema():
+        schema = {
+            "type": "object",
+            "required": ["user_name", "password"]
+        }
+        props = schema["properties"] = {}
+        props["name"] = {
+            "description": "User's name",
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_ ]{1,64}$"
+        }
+        props["password"] = {
+            "description": "User's password",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{32}$"
+        }
+        return 
 
 class Playlist(db.Model):
     __tablename__ = "Playlist"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), nullable=False)
+    tittle = db.Column(db.String(64), nullable=False)
     date_created = db.Column(db.String(64), nullable=False, default="descending")
 
     user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
     songs = db.relationship("Song", secondary="In_Playlist")
     
+    user = db.relationship("User", back_populates="playlists")
     #TODO: Define schema here later
 
 
