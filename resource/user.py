@@ -18,7 +18,7 @@ class UsersResource(Resource):
             "password": entry.password,
             "playlist": entry.playlists
         }
-        return create_respond("200","Successful", json.dumps(body))
+        return create_respond(200,"Successful", json.dumps(body))
 
     def post(self):
         # Do post
