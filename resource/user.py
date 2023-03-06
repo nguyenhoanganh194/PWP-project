@@ -7,8 +7,10 @@ from resource.models import db
 from resource.models import User
 
 class UsersResource(Resource):
-    def get(self, username):
+    def get(self, username = None):
         # Do get
+        if(username is None):
+            return create_respond(415,"Need username")
         entry = db.session.query(User).filter_by(user_name = username).first()
         if entry is None:
             return create_respond(404,"User not found")
@@ -20,7 +22,7 @@ class UsersResource(Resource):
         }
         return create_respond(200,"Successful", json.dumps(body))
 
-    def post(self):
+    def post(self, username = None):
         # Do post
         if not request.json:
             return create_respond(415, "Unsupported media type", "Requests must be JSON")

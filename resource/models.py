@@ -35,7 +35,7 @@ class Playlist(db.Model):
     date_created = db.Column(db.String(64), nullable=False, default="descending")
 
     user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
-    songs = db.relationship("Song", secondary="In_Playlist")
+    songs = db.relationship("Song", secondary="Playlist_track")
     
     user = db.relationship("User", back_populates="playlists")
     #TODO: Define schema here later
