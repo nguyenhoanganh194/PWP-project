@@ -2,20 +2,23 @@ import json
 from flask import Response, request, url_for
 from flask_restful import Resource
 from jsonschema import validate, ValidationError
-from app import db
-from models import User
-class UsersResource(Resource):
-    def get(self):
-        # Do get
-        body =[]
-        
-        for entry in User.query.all():
-            data = {
-                "name": entry.name,
-                "password": entry.password
-            }
 
-        pass
+from resource.models import db
+from resource.models import User
+
+class UsersResource(Resource):
+    def get(self, username):
+        # Do get
+        entry = db.session.query(User).filter_by(user_name = username).first()
+        if entry is None:
+            return create_respond(404,"User not found")
+        body = {
+            "id": entry.id,
+            "name": entry.user_name,
+            "password": entry.password,
+            "playlist": entry.playlists
+        }
+        return create_respond("200","Successful", json.dumps(body))
 
     def post(self):
         # Do post
@@ -35,7 +38,6 @@ class UsersResource(Resource):
         except:
             return create_respond(400,"Can not add users")
         return create_respond(201, "Successful")
-        pass
 
     def put(self, username, password):
         # I dont think we should implement this.
@@ -47,4 +49,9 @@ class UsersResource(Resource):
 
 def create_respond(status_code, title, message=None):
     #Create a respond here
-    return ""
+    url = request.path
+    body = {
+        "tittle": title,
+        "message": message
+    }
+    return Response(json.dumps(body), status_code)
