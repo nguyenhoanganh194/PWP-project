@@ -2,6 +2,12 @@
  The PWP project oulu course
 ## Project Database Instructions:
 
+There are playlist management database models class named 'Playlist', 'PlaylistTrack', 'Track' and 'User'. 
+
+The Playlist model represents a playlist, with a foreign key to the User model, which contains the user's personal information. 
+
+The Track model represents a track, with fields for the name, artist, and duration of the track. The PlaylistTrack model represents the relationship between a playlist and a track, with foreign keys to the Playlist, Track, and User models, representing the playlist the track is in, the track itself, and the user who added the track to the playlist, respectively. 
+
 The dependencies of the project are provided in the file requirements.txt. 
 
 The main database engine used in the project is SQLite, we interact with the database using the Flask SQLAlchemy toolkit.
@@ -15,24 +21,4 @@ the user can populate the database using the flask shell or the existing tests i
 >>> db.session.add(User_John)
 >>> db.session.commit()
 ```
- a test is also included in app.py by default:
- 
- ```python
-
- #Test
-@app.route("/user/add/",methods=["POST"])
-def add_user():
-    try:
-        user = models.User(
-            id = 12,
-            user_name = "12",
-            password = "12"
-        )
-        models.db.session.add(user)
-        models.db.session.commit()
-        return "Successful",201
-    except:
-        return "User already exists",409
-
-
-```
+ a test is also included in unittest.py
