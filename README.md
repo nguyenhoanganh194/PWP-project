@@ -1,5 +1,13 @@
 # PWP-project
  The PWP project oulu course
+ 
+ ## Set up instructions:
+ Set up env
+ ```console
+ $env:FLASK_APP = "playlistmanager"
+ flask run
+ ```
+ 
 ## Project Database Instructions:
 
 There are playlist management database models class named 'Playlist', 'PlaylistTrack', 'Track' and 'User'. 
