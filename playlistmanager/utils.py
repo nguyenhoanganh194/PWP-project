@@ -3,9 +3,6 @@ from flask import Response, request, url_for
 from playlistmanager.constants import *
 from playlistmanager.models import *
 
-# create_error_response and MasonBuilder taken from the Programmable Web Project course material:
-# https://lovelace.oulu.fi/ohjelmoitava-web/ohjelmoitava-web/
-
 def create_error_response(status_code, title, message=None):
     resource_url = request.path
     body = MasonBuilder(resource_url=resource_url)
