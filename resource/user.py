@@ -33,7 +33,7 @@ class UsersResource(Resource):
         user = User()
         user.user_name = request.json["user_name"]
         user.password = request.json["password"]
-
+        print(user)
         try:
             db.session.add(user)
             db.session.commit()
