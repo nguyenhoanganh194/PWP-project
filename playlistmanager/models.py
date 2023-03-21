@@ -1,8 +1,45 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-
+from flask.cli import with_appcontext
+import click
 
 db = SQLAlchemy()
+
+@click.command("init-db")
+@with_appcontext
+def init_db_command():
+    """
+    Initializes a new database.
+    """
+    db.create_all()
+
+@click.command("populate-db")
+@with_appcontext
+def populate_db_command():
+    """
+    Populates an initialized but empty database with some test values.
+    raises IntegrityError: If the database contains the data already
+    %Now only create user.
+    raises OperationalError: If the database is not initialized
+    """
+
+    import hashlib
+    from datetime import datetime
+    from sqlalchemy.exc import IntegrityError, OperationalError
+    try:
+       
+        u = {}
+        for i in range(1, 4):
+            u[i] = User(
+                username="User {}".format(i),
+                password="password{}".format(i),
+            )
+            db.session.add(u[i])
+        db.session.commit()
+    except IntegrityError:
+        print("Failed to populate the database. Database must be empty.")
+    except OperationalError:
+        print("Failed to populate the database. Database must be initialized.")
 
 
 class User(db.Model):
@@ -12,6 +49,19 @@ class User(db.Model):
     password  = db.Column(db.String(64), nullable=False)
 
     playlists = db.relationship("Playlist", cascade="all, delete-orphan", back_populates="user")
+
+    def serialize(self):
+        return {
+            "user_name": self.user_name, 
+            "password": self.password,
+            "playlists": self.playlists.serialize(),
+        }
+    
+    def deserialize(self, doc):
+        self.user_name = doc["user_name"]
+        self.password = doc["password"]
+
+
     @staticmethod
     def get_schema():
         schema = {
@@ -48,6 +98,12 @@ class Playlist(db.Model):
             "created_at": self.created_at,
             "user": self.user.get_schema()
         }
+    
+    def serialize(self):
+        pass
+    
+    def deserialize(self, doc):
+        pass
 
     @staticmethod
     def get_schema(self):

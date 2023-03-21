@@ -2,6 +2,8 @@ import json
 from flask import Response, request, url_for
 from playlistmanager.constants import *
 from playlistmanager.models import *
+from werkzeug.routing import BaseConverter
+from werkzeug.exceptions import NotFound
 
 def create_error_response(status_code, title, message=None):
     resource_url = request.path
@@ -128,3 +130,18 @@ class RespondBodyBuilder(MasonBuilder):
             method="DELETE",
             title="Delete this resource"
         )
+
+
+
+class UserConverter(BaseConverter):
+    """
+    Converter for user resource
+    """
+    def to_python(self, value):
+        user = User.query.filter_by(user_name=value).first()
+        if user is None:
+            raise NotFound
+        return user
+
+    def to_url(self, user):
+        return str(user.user_name)

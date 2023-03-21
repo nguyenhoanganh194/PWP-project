@@ -1,50 +1,28 @@
-import os
-from flask import Flask, redirect
+
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from playlistmanager.constants import *
 
 db = SQLAlchemy()
 
-def create_app(test_config=None):
+def create_app():
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY="dev",
-        SQLALCHEMY_DATABASE_URI="sqlite:///" + os.path.join(app.instance_path, "development.db"),
+        SECRET_KEY="hello",
+        SQLALCHEMY_DATABASE_URI="sqlite:///dev.db",
         SQLALCHEMY_TRACK_MODIFICATIONS=False
     )
-    
-    if test_config is None:
-        app.config.from_pyfile("config.py", silent=True)
-    else:
-        app.config.from_mapping(test_config)
-        
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        pass
-    
-    db.init_app(app)
 
-    from . import models
+
+    with app.app_context():
+        db.init_app(app)
+
     from . import api
-    app.register_blueprint(api.api_bp)
+    from . import models
+    from .utils import UserConverter
+
     app.cli.add_command(models.init_db_command)
     app.cli.add_command(models.populate_db_command)
-
-    @app.route(LINK_RELATIONS_URL)
-    def redirect_link_relations():
-        """
-        Redirect link relations to the Apiary documentation.
-        """
-
-        return redirect(APIARY_URL + "link-relations")
-
-    @app.route("/profiles/<profile>/")
-    def redirect_profiles(profile):
-        """
-        Redirect profiles to the Apiary documentation.
-        """
-
-        return redirect(APIARY_URL + "profiles")
+    app.url_map.converters["user"] = UserConverter
+    app.register_blueprint(api.api_bp)
 
     return app
