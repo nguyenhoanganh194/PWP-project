@@ -6,28 +6,30 @@ db = SQLAlchemy()
 
 
 class User(db.Model):
-    __tablename__ = 'users'
+    __tablename__ = "User"
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(80), nullable=False)
+    user_name  = db.Column(db.String(64), nullable=False, unique=True)
+    password  = db.Column(db.String(64), nullable=False)
 
-    def get_schema_not_dedicate(self):
-        return {
-            "id": self.id,
-            "username": self.username,
-        }
-
+    playlists = db.relationship("Playlist", cascade="all, delete-orphan", back_populates="user")
     @staticmethod
-    def get_schema(self):
-        return {
+    def get_schema():
+        schema = {
             "type": "object",
-            "properties": {
-                "id": {"type": "integer"},
-                "username": {"type": "string", "required": True},
-                "password": {"type": "string", "required": True},
-            }
+            "required": ["user_name", "password"]
         }
-
+        props = schema["properties"] = {}
+        props["user_name"] = {
+            "description": "User's name",
+            "type": "string",
+            "pattern": "^[a-z0-9_]{1,64}$"
+        }
+        props["password"] = {
+            "description": "User's password",
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{64}$"
+        }
+        return schema
 
 # Playlist model
 # the Playlist model has a relationship with the User model using the user_id foreign key

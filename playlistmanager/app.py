@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
 from sqlalchemy import MetaData
 
-import models
-from models import db
+import playlistmanager.models as models
+from playlistmanager.models import db
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///playlistmgt.db"

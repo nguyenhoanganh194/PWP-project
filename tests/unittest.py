@@ -1,6 +1,6 @@
 import unittest
-from app import app, db
-from models import Playlist, PlaylistTrack, User, Track
+from playlistmanager.app import app, db
+from playlistmanager.models import Playlist, PlaylistTrack, User, Track
 
 
 # Note that this code assumes that there are already defined the db from models file.
