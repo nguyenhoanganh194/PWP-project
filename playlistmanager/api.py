@@ -10,7 +10,7 @@ from playlistmanager.resources.playlist import *
 from playlistmanager.resources.playlist_track import *
 from playlistmanager.resources.song import *
 from playlistmanager.constants import *
-from playlistmanager.utils import ScoreBuilder
+from playlistmanager.utils import RespondBodyBuilder
 from flask import Response, redirect
 
 # Resources:

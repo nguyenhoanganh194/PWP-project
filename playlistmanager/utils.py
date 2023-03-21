@@ -101,7 +101,7 @@ class RespondBodyBuilder(MasonBuilder):
             method="POST",
             encoding="json",
             title="Add a new player",
-            schema=Player.get_schema()
+            schema=User.get_schema()
         )
 
     def add_control_edit_user(self, user):
