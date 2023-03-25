@@ -15,14 +15,18 @@ def create_app():
 
     with app.app_context():
         db.init_app(app)
+        
 
     from . import api
     from . import models
-    from .utils import UserConverter
-
+    from .converter import UserConverter , TrackConverter
+    with app.app_context():
+        db.create_all()
+        
     app.cli.add_command(models.init_db_command)
     app.cli.add_command(models.populate_db_command)
     app.url_map.converters["user"] = UserConverter
+    app.url_map.converters["track"] = TrackConverter
     app.register_blueprint(api.api_bp)
 
     return app

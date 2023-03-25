@@ -77,7 +77,7 @@ class RespondBodyBuilder(MasonBuilder):
     """
     A subclass to build application specific Mason objects.
     """
-
+#region User
     def add_control_users_all(self):
         """
         Adds users-all control, which leads to the users collection.
@@ -95,7 +95,7 @@ class RespondBodyBuilder(MasonBuilder):
         """
 
         self.add_control(
-            NAMESPACE_SHORT + "add-user",
+            NAMESPACE_SHORT + ":add-user",
             href=url_for("api.usercollection"),
             method="POST",
             encoding="json",
@@ -110,7 +110,7 @@ class RespondBodyBuilder(MasonBuilder):
         """
 
         self.add_control(
-            "edit",
+            NAMESPACE_SHORT + ":edit-user",
             url_for("api.useritem", user=user),
             method="PUT",
             encoding="json",
@@ -118,6 +118,48 @@ class RespondBodyBuilder(MasonBuilder):
             schema=User.get_schema()
         )
    
+#endregion
+    
+#region Track
+    def add_control_user_tracks_of(self , user):
+        """
+        TODO: fill description for this
+        """
+
+        self.add_control(
+            NAMESPACE_SHORT + ":tracks-of",
+            href=url_for("api.trackcollection", user = user),
+            method="GET",
+            title="List track of users"
+        )
+    def add_control_add_track(self, user):
+        """
+        TODO: fill description for this
+        """
+
+        self.add_control(
+            NAMESPACE_SHORT + ":add-track",
+            href=url_for("api.trackcollection", user = user),
+            method="POST",
+            encoding="json",
+            title="Add a new track",
+            schema=Track.get_schema()
+        )
+
+    def add_control_edit_track(self, user, track):
+        """
+           TODO: fill description for this
+        """
+
+        self.add_control(
+            NAMESPACE_SHORT + ":edit-track",
+            url_for("api.trackitem", user=user, track = track),
+            method="PUT",
+            encoding="json",
+            title="Edit this track",
+            schema=Track.get_schema()
+        )
+#endregion
     def add_control_delete(self, href):
         """
         A generic delete function which should work for all resource types.
@@ -133,15 +175,3 @@ class RespondBodyBuilder(MasonBuilder):
 
 
 
-class UserConverter(BaseConverter):
-    """
-    Converter for user resource
-    """
-    def to_python(self, value):
-        user = User.query.filter_by(user_name=value).first()
-        if user is None:
-            raise NotFound
-        return user
-
-    def to_url(self, user):
-        return str(user.user_name)
