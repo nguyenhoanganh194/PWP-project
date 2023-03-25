@@ -77,15 +77,22 @@ class Playlist(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates = "playlists")
-
+    #TODO:add track in playlist relation ship
     def serialize(self):
-        pass
+        return {
+            "id": self.id,
+            "name": self.name, 
+            "created_at": datetime.isoformat(self.created_at),
+            "user": self.user.serialize()
+        }
     
     def deserialize(self, doc):
-        pass
+        self.name = doc["name"]
+        self.created_at = datetime.fromisoformat(str(doc["created_at"]))
+
 
     @staticmethod
-    def json_schema():
+    def get_schema():
         schema = {
             "type": "object",
             "required": ["name", "created_at"]
@@ -127,7 +134,7 @@ class PlaylistTrack(db.Model):
         pass
 
     @staticmethod
-    def json_schema():
+    def get_schema():
         #Do we need to have track.schema in this ?
         schema = {
             "type": "object",
@@ -167,7 +174,7 @@ class Track(db.Model):
             "name": self.name, 
             "artist": self.artist,
             "duration": self.duration,
-            "song": self.user.serialize()
+            "user": self.user.serialize()
         }
     
     def deserialize(self, doc):
@@ -176,7 +183,7 @@ class Track(db.Model):
         self.duration = doc["duration"]
 
     @staticmethod
-    def json_schema():
+    def get_schema():
         schema = {
             "type": "object",
             "required": ["name", "artist","duration"]

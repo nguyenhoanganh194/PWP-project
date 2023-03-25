@@ -47,6 +47,7 @@ class TrackCollection(Resource):
         try:
             track = Track()
             track.deserialize(request.json)
+            track.user = user
             db.session.add(track)
             db.session.commit()
             return Response(status=201, 
@@ -64,7 +65,9 @@ class TrackItem(Resource):
         """
         TODO: Write information for this
         """
-
+        if not self.check_in_user(user,track):
+            return create_error_response(409, "Not allow", "User not own track")
+    
         body = RespondBodyBuilder()
         body.add_namespace(NAMESPACE_SHORT, LINK_RELATIONS_URL)
         body.add_control("self", url_for("api.trackitem", user=user, track = track))
@@ -89,7 +92,7 @@ class TrackItem(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
-        if track not in user.playlists:
+        if not self.check_in_user(user,track):
             return create_error_response(409, "Not allow", "User not own track")
 
         try:
@@ -107,7 +110,7 @@ class TrackItem(Resource):
         """
         TODO: Write information for this
         """
-        if track not in user.playlists:
+        if not self.check_in_user(user,track):
             return create_error_response(409, "Not allow", "User not own track")
         try:
             db.session.delete(track)
@@ -115,3 +118,9 @@ class TrackItem(Resource):
             return Response(status=204)
         except Exception as e:
             return create_error_response(500, "Something's wrong.", str(e))
+    
+    def check_in_user(self, user , track):
+        if track not in user.tracks:
+            return False
+        else:
+            return True

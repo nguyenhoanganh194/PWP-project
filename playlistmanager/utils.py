@@ -160,6 +160,48 @@ class RespondBodyBuilder(MasonBuilder):
             schema=Track.get_schema()
         )
 #endregion
+
+#region Playlist
+    def add_control_user_playlists_of(self , user):
+        """
+        TODO: fill description for this
+        """
+
+        self.add_control(
+            NAMESPACE_SHORT + ":playlists-of",
+            href=url_for("api.playlistcollection", user = user),
+            method="GET",
+            title="List playlists of users"
+        )
+    def add_control_add_playlist(self, user):
+        """
+        TODO: fill description for this
+        """
+
+        self.add_control(
+            NAMESPACE_SHORT + ":add-playlist",
+            href=url_for("api.playlistcollection", user = user),
+            method="POST",
+            encoding="json",
+            title="Add a new playlist",
+            schema=Playlist.get_schema()
+        )
+
+    def add_control_edit_playlist(self, user, playlist):
+        """
+           TODO: fill description for this
+        """
+
+        self.add_control(
+            NAMESPACE_SHORT + ":edit-playlist",
+            url_for("api.playlistitem", user=user, playlist = playlist),
+            method="PUT",
+            encoding="json",
+            title="Edit this playlist",
+            schema=Playlist.get_schema()
+        )
+#endregion
+
     def add_control_delete(self, href):
         """
         A generic delete function which should work for all resource types.
