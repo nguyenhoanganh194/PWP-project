@@ -51,22 +51,16 @@ class UserCollection(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
-        user = User()
-        user.user_name = request.json["user_name"]
-        user.password = request.json["password"]
-
         try:
+            user = User()
+            user.deserialize(request.json)
             db.session.add(user)
             db.session.commit()
+            return Response(status=201, 
+                            headers={"Location": url_for("api.useritem", user=user)})
         except IntegrityError:
             return create_error_response(409, "Already exists",
-                                         "User '{}' already exists.".format(user.user_name)
-                                         )
-
-        return Response(status=201, headers={
-            "Location": url_for("api.useritem", user=user.user_name)
-        })
-
+                                         "User '{}' already exists.".format(user.user_name))                                        
 
 class UserItem(Resource):
     """
@@ -84,8 +78,7 @@ class UserItem(Resource):
 
     def get(self, user):
         """
-        GET method for the user item information.
-        :param user_name: user's name
+        GET method for the user item information. TODO: Need validate or remove password from serialize method.
         """
 
         body = RespondBodyBuilder()
@@ -95,12 +88,12 @@ class UserItem(Resource):
         body.add_control("collection", url_for("api.usercollection"))
         body.add_control_delete(url_for("api.useritem", user=user.user_name))
         body.add_control_edit_user(user)
+        body["item"] = user.serialize()
         return Response(json.dumps(body), 200, mimetype=MASON)
 
     def put(self, user):
         """
         PUT method for editing the user. Includes the Location header. Requires password authentication.
-        :param user_name: User's current name
         """
 
         status = 204
@@ -111,24 +104,24 @@ class UserItem(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
-        new_user_name = request.json["user_name"].lower().replace(" ", "_")
-
-        if user.user_name != new_user_name and User.query.filter_by(user_name=new_user_name).first():
-            return create_error_response(409, "Already exists", "Username'{}' already exists.".format(new_user_name))
-
-        if user.password != request.json["password"]:
-            return create_error_response(401, "Unauthorized", "Invalid password.")
-
-        if user.user_name != new_user_name:
-            status = 301
-            headers = {"Location": url_for("api.useritem", user=new_user_name)}
-        else:
-            headers = None
-
         try:
-            user.user_name = request.json["user_name"]
-            user.password = request.json["password"]
-            db.session.commit()
+            new_user_name = request.json["user_name"]
+
+            if user.user_name != new_user_name and User.query.filter_by(user_name=new_user_name).first():
+                return create_error_response(409, "Already exists", "Username'{}' already exists.".format(new_user_name))
+
+            if user.password != request.json["password"]:
+                return create_error_response(401, "Unauthorized", "Invalid password.")
+
+            if user.user_name != new_user_name:
+                status = 301
+                user.deserialize(request.json)
+                db.session.commit()
+                headers = {"Location": url_for("api.useritem", user)}
+
+            else:
+                headers = None
+
             return Response(status=status, headers=headers)
         except Exception as e:
             return create_error_response(500, "Something's wrong.", str(e))
@@ -137,7 +130,6 @@ class UserItem(Resource):
     def delete(self, user):
         """
         DELETE method for the user item. Deletes the resource.
-        :param user: user's name
         """
         try:
             db.session.delete(user)

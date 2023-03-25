@@ -22,16 +22,16 @@ class TrackCollection(Resource):
         body = RespondBodyBuilder()
         body.add_namespace(NAMESPACE_SHORT, LINK_RELATIONS_URL)
         body.add_control("self", url_for("api.trackcollection"))
-        body.add_control_add_user()
+        body.add_control_add_track()
         body["items"] = []
-        for db_entry in User.query.all():
+        for track in user.tracks:
             item = RespondBodyBuilder()
-            item.add_control("self", url_for("api.useritem", user=db_entry.user_name))
-            item.add_control("profile", USER_PROFILE)
+            item.add_control("self", url_for("api.trackitem", user=user ,track=track))
+            item.add_control("profile", TRACK_PROFILE)
             body["items"].append(item)
         return Response(json.dumps(body), 200, mimetype=MASON)
 
-    def post(self):
+    def post(self, user):
         """
         TODO: Write information for this
         """
@@ -40,51 +40,43 @@ class TrackCollection(Resource):
             return create_error_response(415, "Unsupported media type", "Requests must be JSON")
 
         try:
-            validate(request.json, User.get_schema())
+            validate(request.json, Track.get_schema())
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
-        user = User()
-        user.user_name = request.json["user_name"]
-        user.password = request.json["password"]
-
         try:
-            db.session.add(user)
+            track = Track()
+            track.deserialize(request.json)
+            db.session.add(track)
             db.session.commit()
-        except IntegrityError:
-            return create_error_response(409, "Already exists",
-                                         "User '{}' already exists.".format(user.user_name)
-                                         )
-
-        return Response(status=201, headers={
-            "Location": url_for("api.useritem", user=user.user_name)
-        })
-
+            return Response(status=201, 
+                            headers={"Location": url_for("api.trackitem", user=user, track = track)})       
+        except Exception as e:
+            return create_error_response(500, "Something's wrong.", str(e))
+                                        
 
 class TrackItem(Resource):
     """
     TODO: Write information for this
     """
 
-    def get(self, user_name):
+    def get(self, user, track):
         """
         TODO: Write information for this
         """
 
-        db_entry = User.query.filter_by(user_name=user_name).first()
-        if db_entry is None:
-            return create_error_response(404, "Not found", "Ulayer '{}' wasn't found.".format(user_name))
-
         body = RespondBodyBuilder()
         body.add_namespace(NAMESPACE_SHORT, LINK_RELATIONS_URL)
-        body.add_control("self", url_for("api.useritem", user=user_name))
-        body.add_control("profile", USER_PROFILE)
-        body.add_control("collection", url_for("api.usercollection"))
-        body.add_control_delete(url_for("api.useritem", user=user_name))
-        body.add_control_edit_user(user_name)
+        body.add_control("self", url_for("api.trackitem", user=user, track = track))
+        body.add_control("profile", TRACK_PROFILE)
+        body.add_control("collection", url_for("api.trackcollection"), user = user)
+        body.add_control_edit_track(user,track)
+        body.add_control_delete(url_for("api.trackitem", user=user, track=track))
+
+        body["item"] = track.serialize()
         return Response(json.dumps(body), 200, mimetype=MASON)
 
-    def put(self, user_name):
+    def put(self,  user, track):
         """
         TODO: Write information for this
         """
@@ -93,47 +85,32 @@ class TrackItem(Resource):
         if not request.json:
             return create_error_response(415, "Unsupported media type", "Requests must be JSON")
         try:
-            validate(request.json, User.get_schema())
+            validate(request.json, Track.get_schema())
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
-        db_entry = User.query.filter_by(user_name=user_name).first()
-        if db_entry is None:
-            return create_error_response(404, "Not found", "User '{}' wasn't found.".format(user_name))
-
-        new_user_name = request.json["user_name"].lower().replace(" ", "_")
-
-        if db_entry.unique_name != new_user_name and User.query.filter_by(unique_name=new_user_name).first():
-            return create_error_response(409, "Already exists", "User '{}' already exists.".format(new_user_name))
-
-        if db_entry.password != request.json["password"]:
-            return create_error_response(401, "Unauthorized", "Invalid password.")
-
-        if db_entry.unique_name != new_user_name:
-            status = 301
-            headers = {"Location": url_for("api.useritem", user=new_user_name)}
-        else:
-            headers = None
+        if track not in user.playlists:
+            return create_error_response(409, "Not allow", "User not own track")
 
         try:
-            db_entry.user_name = request.json["user_name"]
-            db_entry.password = request.json["password"]
+            status = 301
+            track.deserialize(request.json)
             db.session.commit()
+            headers = {"Location": url_for("api.trackitem", user = user, track = track)}
             return Response(status=status, headers=headers)
         except Exception as e:
             return create_error_response(500, "Something's wrong.", str(e))
     
+    
 
-    def delete(self, user):
+    def delete(self, user, track):
         """
         TODO: Write information for this
         """
-
-        db_entry = User.query.filter_by(user_name=user).first()
-        if db_entry is None:
-            return create_error_response(404, "Not found", "User wasn't found.")
+        if track not in user.playlists:
+            return create_error_response(409, "Not allow", "User not own track")
         try:
-            db.session.delete(db_entry)
+            db.session.delete(track)
             db.session.commit()
             return Response(status=204)
         except Exception as e:

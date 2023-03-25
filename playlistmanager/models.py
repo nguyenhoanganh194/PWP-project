@@ -162,10 +162,18 @@ class Track(db.Model):
     user = db.relationship('User', back_populates = "tracks")
 
     def serialize(self):
-        pass
+        return {
+            "id": self.id,
+            "name": self.name, 
+            "artist": self.artist,
+            "duration": self.duration,
+            "song": self.user.serialize()
+        }
     
     def deserialize(self, doc):
-        pass
+        self.name = doc["name"]
+        self.artist = doc["artist"]
+        self.duration = doc["duration"]
 
     @staticmethod
     def json_schema():
