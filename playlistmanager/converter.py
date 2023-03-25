@@ -30,3 +30,16 @@ class TrackConverter(BaseConverter):
 
     def to_url(self, track):
         return str(track.id)
+    
+class PlaylistConverter(BaseConverter):
+    """
+    Converter for playlist resource
+    """
+    def to_python(self, value):
+        playlist = Playlist.query.filter_by(id=value).first()
+        if playlist is None:
+            raise NotFound
+        return playlist
+
+    def to_url(self, playlist):
+        return str(playlist.id)

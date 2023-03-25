@@ -14,8 +14,14 @@ from flask import Response, redirect
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 api = Api(api_bp)
 # Resources:
-api.add_resource(UserCollection, "/users/")
-api.add_resource(UserItem, "/users/<user:user>/")
+api.add_resource(UserCollection, "/user/")
+api.add_resource(UserItem, "/user/<user:user>/")
+
+api.add_resource(TrackCollection, "/track/<user:user>")
+api.add_resource(TrackItem, "/track/<user:user>/<track:track>")
+
+api.add_resource(PlaylistCollection, "/playlist/<user:user>")
+api.add_resource(PlaylistItem, "/playlist/<user:user>/<playlist:playlist>")
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
