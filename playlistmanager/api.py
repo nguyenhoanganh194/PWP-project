@@ -23,6 +23,10 @@ api.add_resource(TrackItem, "/track/<user:user>/<track:track>")
 api.add_resource(PlaylistCollection, "/playlist/<user:user>")
 api.add_resource(PlaylistItem, "/playlist/<user:user>/<playlist:playlist>")
 
+api.add_resource(PlaylistCollection, "/playlist/<user:user>")
+api.add_resource(PlaylistItem, "/playlist/<user:user>/<playlist:playlist>")
+
+
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()

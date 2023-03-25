@@ -43,3 +43,17 @@ class PlaylistConverter(BaseConverter):
 
     def to_url(self, playlist):
         return str(playlist.id)
+    
+class PlaylistTrackConverter(BaseConverter):
+    """
+    Converter for playlist_track resource
+    """
+    def to_python(self, value):
+        playlist_track = PlaylistTrack.query.filter_by(id=value).first()
+        if playlist_track is None:
+            raise NotFound
+        return playlist_track
+
+    def to_url(self, playlist_track):
+        return str(playlist_track.id)
+    

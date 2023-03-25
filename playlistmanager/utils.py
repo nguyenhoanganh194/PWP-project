@@ -202,6 +202,47 @@ class RespondBodyBuilder(MasonBuilder):
         )
 #endregion
 
+#region Playlist_track
+    def add_control_user_playlist_playlisttracks(self , user, playlist):
+        """
+        TODO: fill description for this
+        """
+
+        self.add_control(
+            NAMESPACE_SHORT + ":tracks_of_playlist",
+            href=url_for("api.playlisttrackcollection", user = user, playlist = playlist),
+            method="GET",
+            title="List tracks of playlist of user"
+        )
+    def add_control_add_playlist_track(self, user, playlist):
+        """
+        TODO: fill description for this
+        """
+
+        self.add_control(
+            NAMESPACE_SHORT + ":add-playlisttrack",
+            href=url_for("api.playlisttrackcollection",user = user, playlist = playlist),
+            method="POST",
+            encoding="json",
+            title="Add a new playlisttrack to playlist",
+            schema=PlaylistTrack.get_schema()
+        )
+
+    def add_control_edit_playlisttrack(self, user, playlist, playlist_track):
+        """
+           TODO: fill description for this
+        """
+
+        self.add_control(
+            NAMESPACE_SHORT + ":edit-playlisttrack",
+            url_for("api.playlisttrackitem", user=user, playlist = playlist, playlist_track = playlist_track),
+            method="PUT",
+            encoding="json",
+            title="Edit this playlist",
+            schema=Playlist.get_schema()
+        )
+#endregion
+
     def add_control_delete(self, href):
         """
         A generic delete function which should work for all resource types.
@@ -215,5 +256,29 @@ class RespondBodyBuilder(MasonBuilder):
             title="Delete this resource"
         )
 
+def is_validate_access_playlist(user , playlist):
+    try:
+        if playlist not in user.playlists:
+            return False
+        return True
+    except:
+        return False
+    
 
+def is_validate_access_track(user , track):
+    try:
+        if track not in user.tracks:
+            return False
+        return True
+    except:
+        return False
 
+def is_validate_access_playlist_track(user , playlist , playlist_track):
+    if not is_validate_access_playlist(user,playlist):
+        return False
+    try:
+        if playlist_track not in playlist.playlist_tracks:
+            return False
+        return True
+    except:
+        return False

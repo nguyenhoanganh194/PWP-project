@@ -5,7 +5,7 @@ from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
 from playlistmanager.models import Track
 from playlistmanager import db
-from playlistmanager.utils import RespondBodyBuilder, create_error_response
+from playlistmanager.utils import RespondBodyBuilder, create_error_response, is_validate_access_track
 from playlistmanager.constants import *
 
 
@@ -65,7 +65,7 @@ class TrackItem(Resource):
         """
         TODO: Write information for this
         """
-        if not self.check_in_user(user,track):
+        if not is_validate_access_track(user,track):
             return create_error_response(409, "Not allow", "User not own track")
     
         body = RespondBodyBuilder()
@@ -92,7 +92,7 @@ class TrackItem(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
-        if not self.check_in_user(user,track):
+        if not is_validate_access_track(user,track):
             return create_error_response(409, "Not allow", "User not own track")
 
         try:
@@ -110,7 +110,7 @@ class TrackItem(Resource):
         """
         TODO: Write information for this
         """
-        if not self.check_in_user(user,track):
+        if not is_validate_access_track(user,track):
             return create_error_response(409, "Not allow", "User not own track")
         try:
             db.session.delete(track)
@@ -119,8 +119,3 @@ class TrackItem(Resource):
         except Exception as e:
             return create_error_response(500, "Something's wrong.", str(e))
     
-    def check_in_user(self, user , track):
-        if track not in user.tracks:
-            return False
-        else:
-            return True

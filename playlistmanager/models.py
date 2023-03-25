@@ -11,15 +11,16 @@ class User(db.Model):
     Each user will have a unique name and optional additional information.
     "user_name" is unique name, can be used to search user.
     "password" should be an MD5 checksum string of user's real password.
+    "playlists" TODO fill
+    "tracks" TODO fill
     """
-    __tablename__ = "User"
+    __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
     user_name  = db.Column(db.String(64), nullable=False, unique=True)
     password  = db.Column(db.String(64), nullable=False)
 
     playlists = db.relationship("Playlist", cascade="all, delete-orphan", back_populates="user")
     tracks = db.relationship("Track", cascade="all, delete-orphan", back_populates="user")
-
     def serialize(self):
         playlists_serialize = []
         for entry in self.playlists:
@@ -70,20 +71,26 @@ class Playlist(db.Model):
     "created_at" is ...
     """
 
-    __tablename__ = 'playlists'
+    __tablename__ = 'playlist'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)  # format: yyyy-mm-dd hh:mm:ss
-
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', back_populates = "playlists")
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
+      
+    user = db.relationship('user', back_populates = "playlists")
+    playlist_tracks = db.relationship("playlist_track", cascade="all, delete-orphan", back_populates="playlist")
     #TODO:add track in playlist relation ship
     def serialize(self):
+        track_serialize = []
+        for track in self.tracks:
+            track_serialize.append(track.serialize())
+
         return {
             "id": self.id,
             "name": self.name, 
             "created_at": datetime.isoformat(self.created_at),
-            "user": self.user.serialize()
+            "user": self.user.serialize(),
+            "track": track_serialize
         }
     
     def deserialize(self, doc):
@@ -111,46 +118,6 @@ class Playlist(db.Model):
         return schema
 
 
-# PlaylistTrack model
-class PlaylistTrack(db.Model):
-    """
-    The PlaylistTrack model defines a PlaylistTrack of the API.
-    TODO: fill description for each fields.
-    """
-
-    __tablename__ = 'playlist_tracks'
-    id = db.Column(db.Integer, primary_key=True)
-    
-    track_id = db.Column(db.Integer, db.ForeignKey('track.id'), nullable=False)
-    track = db.relationship('Track', backref=db.backref('playlist_tracks', lazy=True))
-
-    playlist_id = db.Column(db.Integer, db.ForeignKey('playlist.id'), nullable=False)
-    playlist = db.relationship('Playlist', backref=db.backref('playlist_tracks', lazy=True))
-
-    def serialize(self):
-        pass
-    
-    def deserialize(self, doc):
-        pass
-
-    @staticmethod
-    def get_schema():
-        #Do we need to have track.schema in this ?
-        schema = {
-            "type": "object",
-            "required": ["track_id", "playlist_id"]
-        }
-        props = schema["properties"] = {}
-        props["track_id"] = {
-            "description": "Track id",
-            "type": "number",
-        }
-        props["playlist_id"] = {
-            "description": "Playlist id",
-            "type": "number",
-        }
-        return schema
-
 
 # Track model
 class Track(db.Model):
@@ -159,15 +126,15 @@ class Track(db.Model):
     TODO: fill description for each fields.
     """
 
-    __tablename__ = 'tracks'
+    __tablename__ = 'track'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     artist = db.Column(db.String(80), nullable=False)
     duration = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
     
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates = "tracks")
-
+    playlist_tracks = db.relationship("playlist_track", cascade="all, delete-orphan", back_populates="track")
     def serialize(self):
         return {
             "id": self.id,
@@ -204,6 +171,59 @@ class Track(db.Model):
             "type": "number",
         }
         return schema
+
+# PlaylistTrack model
+class PlaylistTrack(db.Model):
+    """
+    The PlaylistTrack model defines a PlaylistTrack of the API.
+    TODO: fill description for each fields.
+    """
+
+    __tablename__ = 'playlist_track'
+    id = db.Column(db.Integer, primary_key=True)
+
+    track_number = db.Column(db.Integer, nullable=False, unique=True)
+    playlist_id = db.Column(db.Integer, db.ForeignKey('playlist.id'), nullable=False)
+    track_id = db.Column(db.Integer, db.ForeignKey('track.id'), nullable=False)
+
+    playlist = db.relationship('playlist', backref=db.backref('playlist_tracks', lazy=True))
+    track = db.relationship('track', backref=db.backref('playlist_tracks', lazy=True))
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "track_number": self.track_number, 
+            "playlist": self.playlist.serialize(),
+            "track": self.track.serialize(),
+        }
+    
+    def deserialize(self, doc):
+        self.track_number = doc["track_number"]
+
+    @staticmethod
+    def get_schema():
+        schema = {
+            "type": "object",
+            "required": ["playlist_id", "track_id","track_number"]
+        }
+        props = schema["properties"] = {}
+        props["playlist_id"] = {
+            "description": "playlist_id",
+            "type": "number",
+        }
+        props["track_id"] = {
+            "description": "track_id",
+            "type": "number",
+        }
+        props["track_number"] = {
+            "description": "track_number",
+            "type": "number",
+        }
+        return schema
+
+
+
+
 
 
 @click.command("init-db")

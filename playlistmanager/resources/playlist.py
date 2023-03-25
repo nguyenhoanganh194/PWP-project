@@ -5,7 +5,7 @@ from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
 from playlistmanager.models import Playlist
 from playlistmanager import db
-from playlistmanager.utils import RespondBodyBuilder, create_error_response
+from playlistmanager.utils import RespondBodyBuilder, create_error_response, is_validate_access_playlist
 from playlistmanager.constants import *
 
 
@@ -65,7 +65,7 @@ class PlaylistItem(Resource):
         """
         TODO: Write information for this
         """
-        if not self.check_in_user(user,playlist):
+        if not is_validate_access_playlist(user,playlist):
             return create_error_response(409, "Not allow", "User not own playlist")
     
         body = RespondBodyBuilder()
@@ -92,7 +92,7 @@ class PlaylistItem(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
-        if not self.check_in_user(user,playlist):
+        if not is_validate_access_playlist(user,playlist):
             return create_error_response(409, "Not allow", "User not own playlist")
 
         try:
@@ -110,7 +110,7 @@ class PlaylistItem(Resource):
         """
         TODO: Write information for this
         """
-        if not self.check_in_user(user,playlist):
+        if not is_validate_access_playlist(user,playlist):
             return create_error_response(409, "Not allow", "User not own playlist")
         try:
             db.session.delete(playlist)
@@ -119,9 +119,3 @@ class PlaylistItem(Resource):
         except Exception as e:
             return create_error_response(500, "Something's wrong.", str(e))
 
-
-    def check_in_user(self, user , playlist):
-        if playlist not in user.playlists:
-            return False
-        else:
-            return True
