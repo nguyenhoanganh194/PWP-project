@@ -23,8 +23,8 @@ api.add_resource(TrackItem, "/track/<user:user>/<track:track>")
 api.add_resource(PlaylistCollection, "/playlist/<user:user>")
 api.add_resource(PlaylistItem, "/playlist/<user:user>/<playlist:playlist>")
 
-api.add_resource(PlaylistCollection, "/playlist/<user:user>")
-api.add_resource(PlaylistItem, "/playlist/<user:user>/<playlist:playlist>")
+api.add_resource(PlaylistTrackCollection, "/playlist_track/<user:user>/<playlist:playlist>")
+api.add_resource(PlaylistTrackItem, "/playlist_track/<user:user>/<playlist:playlist>/<playlist_track:playlist_track>")
 
 
 @event.listens_for(Engine, "connect")
