@@ -1,9 +1,9 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask.cli import with_appcontext
+from playlistmanager import db
 import click
 
-db = SQLAlchemy()
 
 class User(db.Model):
     """
