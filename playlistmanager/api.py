@@ -27,12 +27,6 @@ api.add_resource(PlaylistTrackCollection, "/playlist_track/<user:user>/<playlist
 api.add_resource(PlaylistTrackItem, "/playlist_track/<user:user>/<playlist:playlist>/<playlist_track:playlist_track>")
 
 
-@event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
-
 # Entry point:
 @api_bp.route("/")
 def entry_point():
