@@ -73,7 +73,7 @@ class Playlist(db.Model):
 
     __tablename__ = 'playlist'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True, nullable=False)
+    name = db.Column(db.String(80), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)  # format: yyyy-mm-dd hh:mm:ss
     user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
       
@@ -182,7 +182,7 @@ class PlaylistTrack(db.Model):
     __tablename__ = 'playlist_track'
     id = db.Column(db.Integer, primary_key=True)
 
-    track_number = db.Column(db.Integer, nullable=False, unique=True)
+    track_number = db.Column(db.Integer, nullable=False)
     playlist_id = db.Column(db.Integer, db.ForeignKey('playlist.id'), nullable=False)
     track_id = db.Column(db.Integer, db.ForeignKey('track.id'), nullable=False)
 
@@ -247,20 +247,52 @@ def populate_db_command():
     import hashlib
     from datetime import datetime
     from sqlalchemy.exc import IntegrityError, OperationalError
+
+    meta = MetaData()
+    meta.reflect(db.engine)
+    # Get a list of table names
+    table_names = meta.tables.keys()
+    print(table_names)
+
     try:
-        meta = MetaData()
-        meta.reflect(db.engine)
-        # Get a list of table names
-        table_names = meta.tables.keys()
-        print(table_names)
+        user = {}
         for i in range(1, 4):
-            user = User(
+            user[i] = User(
                 user_name="User{}".format(i),
                 password="password{}".format(i),
             )
-            db.session.add(user)
+            db.session.add(user[i])
+
+            playlist = {}
+            for j in range(1, 4):
+                playlist[j] = Playlist(
+                    name="Playlist{}".format(j),
+                    created_at = datetime.now(),
+                    user = user[i]
+                )
+                db.session.add(playlist[j])
+
+            track = {}
+            for j in range(1, 4):
+                track[j] = Track(
+                    name="Track{}".format(j),
+                    artist ="Artist{}".format(j),
+                    duration = 100*j,
+                    user = user[i]
+                )
+                db.session.add(track[j])
+            
+            for j in range(1, 4):
+                playlist_track = {}
+                for k in range(1, 4):
+                    playlist_track[j] = PlaylistTrack(
+                        track_number= j + k,
+                        playlist =playlist[j],
+                        track = track[j],
+                    )
+                    db.session.add(playlist_track[j])
         db.session.commit()
-        
+
     except IntegrityError:
         print("Failed to populate the database. Database must be empty.")
     except OperationalError:
