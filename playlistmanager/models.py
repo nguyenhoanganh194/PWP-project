@@ -24,11 +24,11 @@ class User(db.Model):
     def serialize(self):
         playlists_serialize = []
         for entry in self.playlists:
-            playlists_serialize.append(entry.serialize())
+            playlists_serialize.append(entry.id)
 
         track_serialize = []
         for entry in self.tracks:
-            track_serialize.append(entry.serialize())
+            track_serialize.append(entry.id)
         return {
             "user_name": self.user_name, 
             "password": self.password,
@@ -51,12 +51,11 @@ class User(db.Model):
         props["user_name"] = {
             "description": "User's name",
             "type": "string",
-            "pattern": "^[a-z0-9_]{1,64}$"
+            "pattern": "^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$"
         }
         props["password"] = {
             "description": "User's password",
             "type": "string",
-            "pattern": "^[a-fA-F0-9]{64}$"
         }
         
         return schema
@@ -82,8 +81,8 @@ class Playlist(db.Model):
     #TODO:add track in playlist relation ship
     def serialize(self):
         track_serialize = []
-        for track in self.tracks:
-            track_serialize.append(track.serialize())
+        for playlist_track in self.playlist_tracks:
+            track_serialize.append(playlist_track.serialize())
 
         return {
             "id": self.id,
@@ -240,7 +239,6 @@ def populate_db_command():
     """
     Populates an initialized but empty database with some test values.
     raises IntegrityError: If the database contains the data already
-    %Now only create user.
     raises OperationalError: If the database is not initialized
     """
 

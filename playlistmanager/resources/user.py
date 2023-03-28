@@ -32,7 +32,7 @@ class UserCollection(Resource):
         body["items"] = []
         for db_entry in User.query.all():
             item = RespondBodyBuilder()
-            item.add_control("self", url_for("api.useritem", user=db_entry.user_name))
+            item.add_control("self", url_for("api.useritem", user=db_entry))
             item.add_control("profile", USER_PROFILE)
             body["items"].append(item)
         return Response(json.dumps(body), 200, mimetype=MASON)
@@ -42,15 +42,12 @@ class UserCollection(Resource):
         POST method for the user collection. Adds a new user and includes the Location header
         in the response.
         """
-
         if not request.json:
             return create_error_response(415, "Unsupported media type", "Requests must be JSON")
-
         try:
             validate(request.json, User.get_schema())
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
-
         try:
             user = User()
             user.deserialize(request.json)
@@ -83,10 +80,10 @@ class UserItem(Resource):
 
         body = RespondBodyBuilder()
         body.add_namespace(NAMESPACE_SHORT, LINK_RELATIONS_URL)
-        body.add_control("self", url_for("api.useritem", user=user.user_name))
+        body.add_control("self", url_for("api.useritem", user=user))
         body.add_control("profile", USER_PROFILE)
         body.add_control("collection", url_for("api.usercollection"))
-        body.add_control_delete(url_for("api.useritem", user=user.user_name))
+        body.add_control_delete(url_for("api.useritem", user=user))
         body.add_control_edit_user(user)
         body["item"] = user.serialize()
         return Response(json.dumps(body), 200, mimetype=MASON)
@@ -110,18 +107,12 @@ class UserItem(Resource):
             if user.user_name != new_user_name and User.query.filter_by(user_name=new_user_name).first():
                 return create_error_response(409, "Already exists", "Username'{}' already exists.".format(new_user_name))
 
-            if user.password != request.json["password"]:
-                return create_error_response(401, "Unauthorized", "Invalid password.")
-
             if user.user_name != new_user_name:
                 status = 301
-                user.deserialize(request.json)
-                db.session.commit()
-                headers = {"Location": url_for("api.useritem", user)}
-
-            else:
-                headers = None
-
+                
+            user.deserialize(request.json)
+            headers = {"Location": url_for("api.useritem", user = user)}
+            db.session.commit()
             return Response(status=status, headers=headers)
         except Exception as e:
             return create_error_response(500, "Something's wrong.", str(e))
