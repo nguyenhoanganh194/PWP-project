@@ -203,7 +203,7 @@ class RespondBodyBuilder(MasonBuilder):
 #endregion
 
 #region Playlist_track
-    def add_control_user_playlist_playlisttracks(self , user, playlist):
+    def add_control_playlist_tracks(self , user, playlist):
         """
         TODO: fill description for this
         """
@@ -239,7 +239,7 @@ class RespondBodyBuilder(MasonBuilder):
             method="PUT",
             encoding="json",
             title="Edit this playlist",
-            schema=Playlist.get_schema()
+            schema=PlaylistTrack.get_schema()
         )
 #endregion
 

@@ -176,6 +176,8 @@ class PlaylistTrack(db.Model):
         return {
             "id": self.id,
             "track_number": self.track_number, 
+            "track_id":self.track_id,
+            "playlist_id": self.playlist_id
         }
     
     def deserialize(self, doc):
@@ -188,10 +190,6 @@ class PlaylistTrack(db.Model):
             "required": ["playlist_id", "track_id","track_number"]
         }
         props = schema["properties"] = {}
-        props["playlist_id"] = {
-            "description": "playlist_id",
-            "type": "number",
-        }
         props["track_id"] = {
             "description": "track_id",
             "type": "number",

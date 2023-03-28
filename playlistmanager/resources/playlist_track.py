@@ -24,12 +24,12 @@ class PlaylistTrackCollection(Resource):
     
         body = RespondBodyBuilder()
         body.add_namespace(NAMESPACE_SHORT, LINK_RELATIONS_URL)
-        body.add_control("self", url_for("api.playlisttrackcollection"))
+        body.add_control("self", url_for("api.playlisttrackcollection",user=user ,playlist=playlist))
         body.add_control_add_playlist_track(user=user,playlist=playlist)
         body["items"] = []
-        for playlist_track in user.playlists:
+        for playlist_track in playlist.playlist_tracks:
             item = RespondBodyBuilder()
-            item.add_control("self", url_for("api.playlisttrackitem", user=user ,playlist=playlist, playlistrack = playlist_track))
+            item.add_control("self", url_for("api.playlisttrackitem", user=user ,playlist=playlist, playlist_track = playlist_track))
             item.add_control("profile", PLAYLIST_TRACK_PROFILE)
             body["items"].append(item)
         return Response(json.dumps(body), 200, mimetype=MASON)
@@ -84,7 +84,7 @@ class PlaylistTrackItem(Resource):
         body.add_namespace(NAMESPACE_SHORT, LINK_RELATIONS_URL)
         body.add_control("self", url_for("api.playlisttrackitem", user=user, playlist = playlist, playlist_track = playlist_track))
         body.add_control("profile", PLAYLIST_TRACK_PROFILE)
-        body.add_control("collection", url_for("api.playlisttrackcollection"), user = user, playlist = playlist)
+        body.add_control("collection", url_for("api.playlisttrackcollection", user = user, playlist = playlist))
         body.add_control_edit_playlisttrack(user,playlist,playlist_track)
         body.add_control_delete(url_for("api.playlisttrackitem", user=user, playlist=playlist, playlist_track = playlist_track))
 
@@ -100,7 +100,7 @@ class PlaylistTrackItem(Resource):
         if not request.json:
             return create_error_response(415, "Unsupported media type", "Requests must be JSON")
         try:
-            validate(request.json, Playlist.get_schema())
+            validate(request.json, PlaylistTrack.get_schema())
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 

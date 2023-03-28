@@ -75,7 +75,7 @@ class PlaylistItem(Resource):
         body.add_control("collection", url_for("api.playlistcollection", user = user))
         body.add_control_edit_playlist(user,playlist)
         body.add_control_delete(url_for("api.playlistitem", user=user, playlist=playlist))
-
+        body.add_control_playlist_tracks(user,playlist)
         body["item"] = playlist.serialize()
         return Response(json.dumps(body), 200, mimetype=MASON)
 
