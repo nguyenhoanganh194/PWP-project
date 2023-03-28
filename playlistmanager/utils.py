@@ -121,7 +121,7 @@ class RespondBodyBuilder(MasonBuilder):
 #endregion
     
 #region Track
-    def add_control_user_tracks_of(self , user):
+    def add_control_tracks(self , user):
         """
         TODO: fill description for this
         """
@@ -162,7 +162,7 @@ class RespondBodyBuilder(MasonBuilder):
 #endregion
 
 #region Playlist
-    def add_control_user_playlists_of(self , user):
+    def add_control_playlists(self , user):
         """
         TODO: fill description for this
         """

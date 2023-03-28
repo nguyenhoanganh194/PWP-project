@@ -85,6 +85,9 @@ class UserItem(Resource):
         body.add_control("collection", url_for("api.usercollection"))
         body.add_control_delete(url_for("api.useritem", user=user))
         body.add_control_edit_user(user)
+        body.add_control_tracks(user)
+        body.add_control_playlists(user)
+
         body["item"] = user.serialize()
         return Response(json.dumps(body), 200, mimetype=MASON)
 

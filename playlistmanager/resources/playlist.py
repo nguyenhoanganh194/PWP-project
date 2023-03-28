@@ -21,8 +21,8 @@ class PlaylistCollection(Resource):
         """
         body = RespondBodyBuilder()
         body.add_namespace(NAMESPACE_SHORT, LINK_RELATIONS_URL)
-        body.add_control("self", url_for("api.playlistcollection"))
-        body.add_control_add_playlist()
+        body.add_control("self", url_for("api.playlistcollection", user=user))
+        body.add_control_add_playlist(user)
         body["items"] = []
         for playlist in user.playlists:
             item = RespondBodyBuilder()
@@ -72,7 +72,7 @@ class PlaylistItem(Resource):
         body.add_namespace(NAMESPACE_SHORT, LINK_RELATIONS_URL)
         body.add_control("self", url_for("api.playlistitem", user=user, playlist = playlist))
         body.add_control("profile", PLAYLIST_PROFILE)
-        body.add_control("collection", url_for("api.playlistcollection"), user = user)
+        body.add_control("collection", url_for("api.playlistcollection", user = user))
         body.add_control_edit_playlist(user,playlist)
         body.add_control_delete(url_for("api.playlistitem", user=user, playlist=playlist))
 

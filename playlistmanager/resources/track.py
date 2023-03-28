@@ -21,8 +21,8 @@ class TrackCollection(Resource):
         """
         body = RespondBodyBuilder()
         body.add_namespace(NAMESPACE_SHORT, LINK_RELATIONS_URL)
-        body.add_control("self", url_for("api.trackcollection"))
-        body.add_control_add_track()
+        body.add_control("self", url_for("api.trackcollection", user = user))
+        body.add_control_add_track(user)
         body["items"] = []
         for track in user.tracks:
             item = RespondBodyBuilder()
@@ -72,7 +72,7 @@ class TrackItem(Resource):
         body.add_namespace(NAMESPACE_SHORT, LINK_RELATIONS_URL)
         body.add_control("self", url_for("api.trackitem", user=user, track = track))
         body.add_control("profile", TRACK_PROFILE)
-        body.add_control("collection", url_for("api.trackcollection"), user = user)
+        body.add_control("collection", url_for("api.trackcollection", user = user))
         body.add_control_edit_track(user,track)
         body.add_control_delete(url_for("api.trackitem", user=user, track=track))
 

@@ -22,18 +22,9 @@ class User(db.Model):
     playlists = db.relationship("Playlist", cascade="all, delete-orphan", back_populates="user")
     tracks = db.relationship("Track", cascade="all, delete-orphan", back_populates="user")
     def serialize(self):
-        playlists_serialize = []
-        for entry in self.playlists:
-            playlists_serialize.append(entry.id)
-
-        track_serialize = []
-        for entry in self.tracks:
-            track_serialize.append(entry.id)
         return {
             "user_name": self.user_name, 
             "password": self.password,
-            "playlists": playlists_serialize,
-            "song": track_serialize
         }
     
     def deserialize(self, doc):
@@ -80,16 +71,10 @@ class Playlist(db.Model):
     playlist_tracks = db.relationship("PlaylistTrack", cascade="all, delete-orphan", back_populates="playlist")
     #TODO:add track in playlist relation ship
     def serialize(self):
-        track_serialize = []
-        for playlist_track in self.playlist_tracks:
-            track_serialize.append(playlist_track.serialize())
-
         return {
             "id": self.id,
             "name": self.name, 
             "created_at": datetime.isoformat(self.created_at),
-            "user": self.user.serialize(),
-            "track": track_serialize
         }
     
     def deserialize(self, doc):
@@ -107,7 +92,7 @@ class Playlist(db.Model):
         props["name"] = {
             "description": "Playlist name",
             "type": "string",
-            "pattern": "^[a-z0-9_]{1,64}$"
+            "pattern": "^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$"
         }
         props["created_at"] = {
             "description": "Date time created",
@@ -140,7 +125,6 @@ class Track(db.Model):
             "name": self.name, 
             "artist": self.artist,
             "duration": self.duration,
-            "user": self.user.serialize()
         }
     
     def deserialize(self, doc):
@@ -158,12 +142,12 @@ class Track(db.Model):
         props["name"] = {
             "description": "Track name",
             "type": "string",
-            "pattern": "^[a-z0-9_]{1,64}$"
+            "pattern": "^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$"
         }
         props["artist"] = {
             "description": "Artist name",
             "type": "string",
-            "pattern": "^[a-z0-9_]{1,64}$"
+            "pattern": "^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$"
         }
         props["duration"] = {
             "description": "Duration",
@@ -192,8 +176,6 @@ class PlaylistTrack(db.Model):
         return {
             "id": self.id,
             "track_number": self.track_number, 
-            "playlist": self.playlist.serialize(),
-            "track": self.track.serialize(),
         }
     
     def deserialize(self, doc):
