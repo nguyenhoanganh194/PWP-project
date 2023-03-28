@@ -84,16 +84,18 @@ class TestUserResource(object):
     invalid_data = None #TODO: define invalid user. can use a list
     valid_data = None #TODO: define valid user. can use a list
     def test_get_collection(self, client):
-        populate_test_db(db)
-        resp = client.get(self.RESOURCE_URL)
-        assert resp.status_code == 200
-        body = json.loads(resp.data)
-        #TODO: check if list user show correctly
-        #TODO: check if hypermedia show correctly
+        with client.app_context():
+            populate_test_db(db)
+            resp = client.get(self.RESOURCE_URL)
+            assert resp.status_code == 200
+            body = json.loads(resp.data)
+            #TODO: check if list user show correctly
+            #TODO: check if hypermedia show correctly
         pass
 
     def test_post_collection(self, client):
-        resp = client.post(self.RESOURCE_URL, data=json.dumps(self.valid_data))
+        with client.app_context():
+            resp = client.post(self.RESOURCE_URL, data=json.dumps(self.valid_data))
         #TODO: check if that user is in database
         #TODO: check if location show correctly
         pass
@@ -110,33 +112,4 @@ class TestUserResource(object):
         #TODO: do same thing base on function tittle + hypermedia
         pass
 
-class TestPlaylistResource(object):
-    RESOURCE_URL = "/api/playlist/"
-    invalid_data = None #TODO: define invalid user. can use a list
-    valid_data = None #TODO: define valid user. can use a list
-    def test_get_collection(self, client):
-        populate_test_db(db)
-        resp = client.get(self.RESOURCE_URL)
-        assert resp.status_code == 200
-        body = json.loads(resp.data)
-        #TODO: do same thing base on function tittle + hypermedia
-        pass
-
-    def test_post_collection(self, client):
-        resp = client.post(self.RESOURCE_URL, data=json.dumps(self.valid_data))
-        #TODO: do same thing base on function tittle + hypermedia
-        pass
-
-    def test_get_item(self, client):
-        #TODO: do same thing base on function tittle + hypermedia
-        pass
-
-    def test_put_item(self, client):
-        #TODO: do same thing base on function tittle + hypermedia
-        pass
-
-    def test_delete_item(self, client):
-        #TODO: do same thing base on function tittle + hypermedia
-        pass
-
-#TODO: do same thing for 2 other resource.
+#TODO: do same thing for 3 other resource.
