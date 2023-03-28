@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask.cli import with_appcontext
 from playlistmanager import db
 import click
-
+from sqlalchemy import MetaData
 
 class User(db.Model):
     """
@@ -77,8 +77,8 @@ class Playlist(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)  # format: yyyy-mm-dd hh:mm:ss
     user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
       
-    user = db.relationship('user', back_populates = "playlists")
-    playlist_tracks = db.relationship("playlist_track", cascade="all, delete-orphan", back_populates="playlist")
+    user = db.relationship('User', back_populates = "playlists")
+    playlist_tracks = db.relationship("PlaylistTrack", cascade="all, delete-orphan", back_populates="playlist")
     #TODO:add track in playlist relation ship
     def serialize(self):
         track_serialize = []
@@ -134,7 +134,7 @@ class Track(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
     
     user = db.relationship('User', back_populates = "tracks")
-    playlist_tracks = db.relationship("playlist_track", cascade="all, delete-orphan", back_populates="track")
+    playlist_tracks = db.relationship("PlaylistTrack", cascade="all, delete-orphan", back_populates="track")
     def serialize(self):
         return {
             "id": self.id,
@@ -186,8 +186,8 @@ class PlaylistTrack(db.Model):
     playlist_id = db.Column(db.Integer, db.ForeignKey('playlist.id'), nullable=False)
     track_id = db.Column(db.Integer, db.ForeignKey('track.id'), nullable=False)
 
-    playlist = db.relationship('playlist', backref=db.backref('playlist_tracks', lazy=True))
-    track = db.relationship('track', backref=db.backref('playlist_tracks', lazy=True))
+    playlist = db.relationship('Playlist', back_populates = "playlist_tracks")
+    track = db.relationship('Track', back_populates = "playlist_tracks")
 
     def serialize(self):
         return {
@@ -248,15 +248,19 @@ def populate_db_command():
     from datetime import datetime
     from sqlalchemy.exc import IntegrityError, OperationalError
     try:
-       
-        u = {}
+        meta = MetaData()
+        meta.reflect(db.engine)
+        # Get a list of table names
+        table_names = meta.tables.keys()
+        print(table_names)
         for i in range(1, 4):
-            u[i] = User(
-                username="User {}".format(i),
+            user = User(
+                user_name="User{}".format(i),
                 password="password{}".format(i),
             )
-            db.session.add(u[i])
+            db.session.add(user)
         db.session.commit()
+        
     except IntegrityError:
         print("Failed to populate the database. Database must be empty.")
     except OperationalError:
