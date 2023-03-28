@@ -2,10 +2,24 @@
  The PWP project oulu course
  
  ## Set up instructions:
- Set up env
+ Set up env (window shell)
  ```console
+ venv/Scripts/activate
+ pip install -r requirements.txt
  $env:FLASK_APP = "playlistmanager"
- flask run
+ ```
+ 
+ If no database created yet
+ ```console
+ flask init-db
+ ```
+ If create some fake data
+ ```console
+ flask populate-db
+ ```
+ Run all test
+ ```console
+ pytest
  ```
  
 ## Project Database Instructions:
