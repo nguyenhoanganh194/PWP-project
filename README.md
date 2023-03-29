@@ -21,7 +21,10 @@
  ```console
  pytest
  ```
- 
+ Run the project
+ ```console
+ flask run
+ ```
 ## Project Database Instructions:
 
 There are playlist management database models class named 'Playlist', 'PlaylistTrack', 'Track' and 'User'. 
