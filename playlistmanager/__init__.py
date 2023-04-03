@@ -1,7 +1,9 @@
 
 import os
-from flask import Flask
+from flask import Flask, redirect
 from flask_sqlalchemy import SQLAlchemy
+
+from playlistmanager.constants import *
 
 db = SQLAlchemy()
 
@@ -36,4 +38,12 @@ def create_app(test_config=None):
     app.url_map.converters["playlist_track"] = PlaylistTrackConverter
     app.register_blueprint(api.api_bp)
 
+    @app.route(LINK_RELATIONS_URL)
+    def redirect_link_relations():
+        return redirect(APIARY_URL + "link-relations")
+    
+    @app.route("/profiles/<profile>/")
+    def redirect_profiles(profile):
+        return redirect(APIARY_URL + "profiles")
+    
     return app
