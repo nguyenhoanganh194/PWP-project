@@ -2,8 +2,10 @@ from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask.cli import with_appcontext
 from playlistmanager import db
-import click
 from sqlalchemy import MetaData
+import click
+import hashlib
+
 
 class User(db.Model):
     """
@@ -21,10 +23,11 @@ class User(db.Model):
 
     playlists = db.relationship("Playlist", cascade="all, delete-orphan", back_populates="user")
     tracks = db.relationship("Track", cascade="all, delete-orphan", back_populates="user")
+    api_key = db.relationship("AuthenticateKey", cascade="all, delete-orphan", back_populates="user")
+
     def serialize(self):
         return {
-            "user_name": self.user_name, 
-            "password": self.password,
+            "user_name": self.user_name
         }
     
     def deserialize(self, doc):
@@ -200,7 +203,21 @@ class PlaylistTrack(db.Model):
         }
         return schema
 
-
+class AuthenticateKey(db.Model):
+    """
+    The PlaylistTrack model defines a PlaylistTrack of the API.
+    TODO: fill description for each fields.
+    """
+    key = db.Column(db.String(32), nullable=False, unique=True,primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
+    admin =  db.Column(db.Boolean, default=False)
+     
+    user = db.relationship('User', back_populates = "api_key", uselist=False)
+    
+    @staticmethod
+    def key_hash(key):
+        return hashlib.sha256(key.encode()).digest()
+     
 
 
 
@@ -222,7 +239,7 @@ def populate_db_command():
     raises OperationalError: If the database is not initialized
     """
 
-    import hashlib
+    import secrets
     from datetime import datetime
     from sqlalchemy.exc import IntegrityError, OperationalError
 
@@ -232,46 +249,55 @@ def populate_db_command():
     table_names = meta.tables.keys()
     print(table_names)
 
-    try:
-        user = {}
-        for i in range(1, 4):
-            user[i] = User(
-                user_name="User{}".format(i),
-                password="password{}".format(i),
+    token = secrets.token_urlsafe()
+    db_key = AuthenticateKey(
+        key= AuthenticateKey.key_hash(token),
+        admin=True
+    )
+    db.session.add(db_key)
+    print(token)
+    user = {}
+    for i in range(1, 4):
+        user[i] = User(
+            user_name="User{}".format(i),
+            password="password{}".format(i),
+        )
+        db.session.add(user[i])
+        playlist = {}
+        for j in range(1, 4):
+            playlist[j] = Playlist(
+                name="Playlist{}".format(j),
+                created_at = datetime.now(),
+                user = user[i]
             )
-            db.session.add(user[i])
+            db.session.add(playlist[j])
 
-            playlist = {}
-            for j in range(1, 4):
-                playlist[j] = Playlist(
-                    name="Playlist{}".format(j),
-                    created_at = datetime.now(),
-                    user = user[i]
+        track = {}
+        for j in range(1, 4):
+            track[j] = Track(
+                name="Track{}".format(j),
+                artist ="Artist{}".format(j),
+                duration = 100*j,
+                user = user[i]
+            )
+            db.session.add(track[j])
+        
+        for j in range(1, 4):
+            playlist_track = {}
+            for k in range(1, 4):
+                playlist_track[j] = PlaylistTrack(
+                    track_number= j + k,
+                    playlist =playlist[j],
+                    track = track[j],
                 )
-                db.session.add(playlist[j])
+                db.session.add(playlist_track[j])
 
-            track = {}
-            for j in range(1, 4):
-                track[j] = Track(
-                    name="Track{}".format(j),
-                    artist ="Artist{}".format(j),
-                    duration = 100*j,
-                    user = user[i]
-                )
-                db.session.add(track[j])
-            
-            for j in range(1, 4):
-                playlist_track = {}
-                for k in range(1, 4):
-                    playlist_track[j] = PlaylistTrack(
-                        track_number= j + k,
-                        playlist =playlist[j],
-                        track = track[j],
-                    )
-                    db.session.add(playlist_track[j])
-        db.session.commit()
-
-    except IntegrityError:
-        print("Failed to populate the database. Database must be empty.")
-    except OperationalError:
-        print("Failed to populate the database. Database must be initialized.")
+    key = {}
+    for i in range(1, 4):        
+        key[i] = AuthenticateKey(
+            key=AuthenticateKey.key_hash("User{}".format(i)),
+            admin = False,
+            user=user[i],
+        )
+        db.session.add(key[i])
+    db.session.commit()

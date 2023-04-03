@@ -1,9 +1,10 @@
 import json
+import secrets
 from flask import Response, request, url_for
 from playlistmanager.constants import *
 from playlistmanager.models import *
 from werkzeug.routing import BaseConverter
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, Forbidden
 
 def create_error_response(status_code, title, message=None):
     resource_url = request.path
@@ -282,3 +283,27 @@ def is_validate_access_playlist_track(user , playlist , playlist_track):
         return True
     except:
         return False
+    
+def require_admin(func):
+    def wrapper(*args, **kwargs):
+        try:
+            key_hash = AuthenticateKey.key_hash(request.headers.get("authenticate_key").strip())
+            db_key = AuthenticateKey.query.filter_by(admin=True).first()
+            if secrets.compare_digest(key_hash, db_key.key):
+                return func(*args, **kwargs)
+            raise Forbidden
+        except:
+            raise Forbidden
+    return wrapper
+
+def require_user_key(func):
+    def wrapper(self, user, *args, **kwargs):
+        try:
+            key_hash = AuthenticateKey.key_hash(request.headers.get("authenticate_key").strip())
+            db_key = AuthenticateKey.query.filter_by(user=user).first()
+            if db_key is not None and secrets.compare_digest(key_hash, db_key.key):
+                return func(*args, **kwargs)
+            raise Forbidden
+        except:
+            raise Forbidden
+    return wrapper

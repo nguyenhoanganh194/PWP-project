@@ -5,7 +5,7 @@ from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
 from playlistmanager.models import User
 from playlistmanager import db
-from playlistmanager.utils import RespondBodyBuilder, create_error_response
+from playlistmanager.utils import RespondBodyBuilder, create_error_response, require_admin, require_user_key
 from playlistmanager.constants import *
 
 
@@ -75,7 +75,7 @@ class UserItem(Resource):
 
     def get(self, user):
         """
-        GET method for the user item information. TODO: Need validate or remove password from serialize method.
+        GET method for the user item information.
         """
 
         body = RespondBodyBuilder()
@@ -91,9 +91,10 @@ class UserItem(Resource):
         body["item"] = user.serialize()
         return Response(json.dumps(body), 200, mimetype=MASON)
 
+    @require_user_key
     def put(self, user):
         """
-        PUT method for editing the user. Includes the Location header. Requires password authentication.
+        PUT method for editing the user. Includes the Location header. Requires api authentication.
         """
 
         status = 204
@@ -120,10 +121,10 @@ class UserItem(Resource):
         except Exception as e:
             return create_error_response(500, "Something's wrong.", str(e))
     
-
+    @require_user_key
     def delete(self, user):
         """
-        DELETE method for the user item. Deletes the resource.
+        DELETE method for the user item. Deletes the resource. Requires api authentication.
         """
         try:
             db.session.delete(user)
