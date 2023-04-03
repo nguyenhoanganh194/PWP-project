@@ -19,7 +19,8 @@
  ```
  Run all test
  ```console
- pytest
+ python -m py.test
+ python -m py.test --cov-report term-missing --cov=playlistmanager
  ```
  Run the project
  ```console
