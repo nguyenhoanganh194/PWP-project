@@ -13,8 +13,6 @@ class User(db.Model):
     Each user will have a unique name and optional additional information.
     "user_name" is unique name, can be used to search user.
     "password" should be an MD5 checksum string of user's real password.
-    "playlists" TODO fill
-    "tracks" TODO fill
     """
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
