@@ -88,6 +88,8 @@ class PlaylistTrackItem(Resource):
         body.add_control_edit_playlisttrack(user,playlist,playlist_track)
         body.add_control_delete(url_for("api.playlisttrackitem", user=user, playlist=playlist, playlist_track = playlist_track))
 
+        track = Track.query.filter_by(id=playlist_track.track_id).first()
+        body.add_control("track", url_for("api.trackitem", user=user, track = track))
         body["item"] = playlist_track.serialize()
         return Response(json.dumps(body), 200, mimetype=MASON)
 

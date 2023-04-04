@@ -342,6 +342,7 @@ class TestPlaylistTrackResource(object):
             check_control_get_method(app,"profile", body, 302)
             check_control_get_method(app,"collection", body)
             check_control_get_method(app,"self", body)
+            check_control_get_method(app,"track", body)
 
             check_control_put_method(app,"plm:edit-playlisttrack", obj=body,body= self.valid_data)
             
