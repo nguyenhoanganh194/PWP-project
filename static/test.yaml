@@ -190,18 +190,20 @@ paths:
           content:
             application/json:
               example:
-                - name: playlist_1
-                  created_at: 2020-01-04T22:22:29+00:00
-                - name: playlist_2
-                  created_at: 2021-01-04T22:23:29+00:00
+                - name: track_1
+                  artist: artist_1
+                  duration: 200
+                - name: track_2
+                  artist: artist_2
+                  duration: 300
     post:
-      description: Create a new playlist for a user
+      description: Create a new track for a user
       responses:
         '201':
-          description: Create play successful
+          description: Create track successful
           headers:
             Location:
-              description: URI of the new playlist
+              description: URI of the new track
               schema:
                 type: string
         '400':
@@ -213,45 +215,47 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Playlist'
+              $ref: '#/components/schemas/Track'
             example:
-              name: playlist_1
-              created_at: 2020-01-04T22:22:29+00:00
-              
-  /playlist/{user}/{playlist id}:
+              name: track_2
+              artist: artist_2
+              duration: 300
+  /track/{user}/{track id}:
     parameters:
     - $ref: '#/components/parameters/user'
-    - $ref: '#/components/parameters/playlist'
+    - $ref: '#/components/parameters/track'
     get:
-      description: Get details of one playlist
+      description: Get details of one track
       responses:
         '201':
-          description: Information about the playlist
+          description: Information about the track
           content:
             application/json:
               examples:
                 existing-playlist:
                   description: Existing playlist that has been created previously
                   value:
-                    name: playlist_1
-                    created_at: 2020-01-04T22:22:29+00:00
+                    name: track_2
+                    artist: artist_2
+                    duration: 300
     put:
-      description: Modify details of one playlist.
+      description: Modify details of one track.
       responses:
         '204':
           description: Modify successful
         '409':
-          description: The user not own that playlist 
+          description: The user not own that track 
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Playlist'
+              $ref: '#/components/schemas/Track'
             example:
-              name: playlist_2
-              created_at: 2021-01-04T22:23:29+00:00
+              name: track_2
+              artist: artist_2
+              duration: 300
     delete:
-      description: Delete one playlist
+      description: Delete one track
       responses:
         '204':
           description: Delete successful
@@ -259,12 +263,101 @@ paths:
             application/json:
               examples:
                 existing-recipe:
-                  description: Existing playlist that has been created previously
+                  description: Existing track that has been created previously
         '404':
-          description: The playlist was not found
+          description: The track was not found
         '409':
-          description: The user not own that playlist            
+          description: The user not own that track            
 
+  /playlist_track/{user}/{playlist id}/:
+    parameters:
+    - $ref: '#/components/parameters/user'
+    - $ref: '#/components/parameters/playlist'
+    get:
+      description: Get the playlist track collection of a playlist
+      responses:
+        '200':
+          description: List of playlist track
+          content:
+            application/json:
+              example:
+                - id: 1
+                - id: 2
+    post:
+      description: Create a new playlist track for a playlist
+      responses:
+        '201':
+          description: Create playlist track successful
+          headers:
+            Location:
+              description: URI of the new playlist track
+              schema:
+                type: string
+        '400':
+          description: Json data is not correct
+        '415':
+          description: Request content type must be JSON
+        '409':
+          description: User does not own the track or playlist
+      requestBody:
+        description: JSON document that contains basic data for a playlist
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Playlisttrack'
+            example:
+              track_number: 1
+              track_id: 1
+              playlist_id: 1
+  /playlist_track/{user}/{playlist id}/{playlist track id}:
+    parameters:
+    - $ref: '#/components/parameters/user'
+    - $ref: '#/components/parameters/playlist'
+    - $ref: '#/components/parameters/playlisttrack'
+    get:
+      description: Get details of one playlist track
+      responses:
+        '201':
+          description: Information about the playlist track
+          content:
+            application/json:
+              examples:
+                existing-playlist:
+                  description: Existing playlist track that has been created previously
+                  value:
+                    track_number: 1
+                    track_id: 1
+                    playlist_id: 1
+    put:
+      description: Modify details of one playlist track.
+      responses:
+        '204':
+          description: Modify successful
+        '409':
+          description: The user not own that track or the playlist 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Playlisttrack'
+            example:
+              track_number: 1
+              track_id: 1
+              playlist_id: 1
+    delete:
+      description: Delete one playlist track
+      responses:
+        '204':
+          description: Delete successful
+          content:
+            application/json:
+              examples:
+                existing-recipe:
+                  description: Existing playlist track that has been created previously
+        '404':
+          description: The track was not found
+        '409':
+          description: The user not own that playlist         
           
 components:
   schemas:
@@ -311,7 +404,22 @@ components:
         - name
         - artist
         - duration 
-        
+    Playlisttrack:
+      type: object
+      properties:
+        track_number:
+          description: Order in playlist
+          type: string
+        track_id:
+          description: Id of the track
+          type: string
+        playlist_id:
+          description: Id of the playlist
+          type: number
+      required:
+        - track_number
+        - track_id
+        - playlist_id 
   parameters:
     user:
       description: username

@@ -74,7 +74,6 @@ class TestUserResource(object):
             assert resp.status_code == 200
             
             body = json.loads(resp.data)
-            print(body)
             check_namespace(app,body)
             check_control_get_method(app,"profile", body, 302)
             check_control_get_method(app,"collection", body)
