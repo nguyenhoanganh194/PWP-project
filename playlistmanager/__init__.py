@@ -40,7 +40,7 @@ def create_app(test_config=None):
 
     @app.route(LINK_RELATIONS_URL)
     def redirect_link_relations():
-        return redirect(APIARY_URL + "link-relations")
+        return render_template('swaggerui.html')
     
 
     @app.route("/")
@@ -54,6 +54,6 @@ def create_app(test_config=None):
     
     @app.route("/profiles/<profile>/")
     def redirect_profiles(profile):
-        return redirect(APIARY_URL + "profiles")
+         return render_template('swaggerui.html')
     
     return app

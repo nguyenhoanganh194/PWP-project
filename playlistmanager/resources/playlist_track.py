@@ -11,13 +11,20 @@ from playlistmanager.constants import *
 
 class PlaylistTrackCollection(Resource):
     """
-    The PlaylistTrackCollection resource supports ...
-    TODO: Write information for this
+    The PlaylistTrackCollection resource supports GET and POST methods.
+    Possible response codes:
+    200 with a successful GET
+    201 with a successful POST
+    400 if JSON validating fails
+    409 if item exists already
+    415 if request is not JSON
     """
 
     def get(self, user, playlist):
         """
-        TODO: Write information for this
+        GET method for the PlaylistTrackCollection. Lists user playlist track in the play list.
+        : param user: user model
+        : param playlist: playlist model
         """
         if not is_validate_access_playlist(user,playlist):
             return create_error_response(409, "Not allow", "User not own playlist")
@@ -36,7 +43,9 @@ class PlaylistTrackCollection(Resource):
 
     def post(self, user, playlist):
         """
-        TODO: Write information for this
+        POST method for the PlaylistTrackCollection. Add new playlisttrack to a playlist
+        : param user: user model
+        : param playlist: playlist model
         """
         if not is_validate_access_playlist(user,playlist):
             return create_error_response(409, "Not allow", "User not own playlist")
@@ -67,12 +76,24 @@ class PlaylistTrackCollection(Resource):
 
 class PlaylistTrackItem(Resource):
     """
-    TODO: Write information for this
+    The PlaylistTrackItem resource supports GET, PUT, and DELETE methods.
+    Possible response codes:
+    200 with a successful GET
+    204 with a successful PUT or DELETE
+    301 if item's location changes
+    400 if JSON validating fails
+    401 if invalid password
+    404 if item was not found
+    409 if item exists already
+    415 if request is not JSON
     """
 
     def get(self, user, playlist, playlist_track):
         """
-        TODO: Write information for this
+        GET method for the PlaylistTrackItem. Get a playlisttrack details information
+        : param user: user model
+        : param playlist: playlist model
+        : param playlist_track: playlist_track model
         """
         if not is_validate_access_playlist_track(user,playlist,playlist_track):
             return create_error_response(409, "Not allow", "User not own playlist track")
@@ -92,7 +113,10 @@ class PlaylistTrackItem(Resource):
 
     def put(self, user, playlist, playlist_track):
         """
-        TODO: Write information for this
+        PUT method for the PlaylistTrackItem. Edit a playlisttrack details information
+        : param user: user model
+        : param playlist: playlist model
+        : param playlist_track: playlist_track model
         """
 
         status = 204
@@ -117,7 +141,10 @@ class PlaylistTrackItem(Resource):
     
     def delete(self, user, playlist, playlist_track):
         """
-        TODO: Write information for this
+        DELETE method for the PlaylistTrackItem. Delete a playlisttrack from a playlist
+        : param user: user model
+        : param playlist: playlist model
+        : param playlist_track: playlist_track model
         """
         if not is_validate_access_playlist_track(user,playlist, playlist_track):
             return create_error_response(409, "Not allow", "User not own playlist track")

@@ -56,6 +56,8 @@ class User(db.Model):
 class Playlist(db.Model):
     """
     The Playlist model defines a playlist of the API.
+    "name" is playlist name, can be used to search user.
+    "created_at" is the datetime that the playlist is created.
     """
 
     __tablename__ = 'playlist'
@@ -102,6 +104,9 @@ class Playlist(db.Model):
 class Track(db.Model):
     """
     The Track model defines a Track of the API.
+    "name" is playlist name, can be used to search user.
+    "artist" is singer of the track, is string and can be use to search.
+    "duration" is singer of the track, is string and can be use to search.
     """
 
     __tablename__ = 'track'
@@ -151,6 +156,9 @@ class Track(db.Model):
 class PlaylistTrack(db.Model):
     """
     The PlaylistTrack model defines a PlaylistTrack of the API.
+    "track_number" is integer, use to ordering the track in playlist
+    "track_id"  is integer, is the id of track
+    "playlist_id" is integer, is the id of playlist
     """
 
     __tablename__ = 'playlist_track'
@@ -197,7 +205,10 @@ class PlaylistTrack(db.Model):
 
 class AuthenticateKey(db.Model):
     """
-    The PlaylistTrack model defines a PlaylistTrack of the API.
+    The AuthenticateKey model is model of api key.
+    key is hashed key that store in the api, compare hash to authorize access.
+    user_id is integer, defined what key of user.
+    admin is bool define which key is admin key
     """
     key = db.Column(db.String(32), nullable=False, unique=True,primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)

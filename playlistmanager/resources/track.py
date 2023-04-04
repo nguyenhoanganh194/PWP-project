@@ -11,13 +11,19 @@ from playlistmanager.constants import *
 
 class TrackCollection(Resource):
     """
-    The TrackCollection resource supports ...
-    TODO: Write information for this
+    The TrackCollection resource supports GET and POST methods.
+    Possible response codes:
+    200 with a successful GET
+    201 with a successful POST
+    400 if JSON validating fails
+    409 if item exists already
+    415 if request is not JSON
     """
 
     def get(self, user):
         """
-        TODO: Write information for this
+        GET method for the TrackCollection. Lists user tracks
+        : param user: user model
         """
         body = RespondBodyBuilder()
         body.add_namespace(NAMESPACE_SHORT, LINK_RELATIONS_URL)
@@ -33,7 +39,8 @@ class TrackCollection(Resource):
 
     def post(self, user):
         """
-        TODO: Write information for this
+        GET method for the TrackCollection. Add new track to user tracks
+        : param user: user model
         """
 
         if not request.json:
@@ -57,12 +64,22 @@ class TrackCollection(Resource):
 
 class TrackItem(Resource):
     """
-    TODO: Write information for this
+    The TrackItem resource supports GET, PUT, and DELETE methods.
+    Possible response codes:
+    200 with a successful GET
+    204 with a successful PUT or DELETE
+    301 if item's location changes
+    400 if JSON validating fails
+    404 if item was not found
+    409 if item exists already
+    415 if request is not JSON
     """
 
     def get(self, user, track):
         """
-        TODO: Write information for this
+        GET method for the TrackItem.Get a TrackItem details information
+        : param user: user model
+        : param track: track model
         """
         if not is_validate_access_track(user,track):
             return create_error_response(409, "Not allow", "User not own track")
@@ -80,7 +97,9 @@ class TrackItem(Resource):
 
     def put(self,  user, track):
         """
-        TODO: Write information for this
+        PUT method for the TrackItem. Edit a TrackItem details information
+        : param user: user model
+        : param track: track model
         """
 
         status = 204
@@ -104,7 +123,9 @@ class TrackItem(Resource):
 
     def delete(self, user, track):
         """
-        TODO: Write information for this
+        PUT method for the TrackItem. Delete a TrackItem
+        : param user: user model
+        : param track: track model
         """
         if not is_validate_access_track(user,track):
             return create_error_response(409, "Not allow", "User not own track")

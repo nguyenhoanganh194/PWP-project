@@ -21,6 +21,7 @@ class MasonBuilder(dict):
     elements into the object but mostly is just a parent for the much more
     useful subclass defined next. This class is generic in the sense that it
     does not contain any application specific implementation details.
+    From PWP course.
     """
 
     def add_error(self, title, details):
@@ -107,7 +108,7 @@ class RespondBodyBuilder(MasonBuilder):
     def add_control_edit_user(self, user):
         """
         Adds edit control, which is used to edit user item.
-        : param str user: user's user_name
+        : param user: user
         """
 
         self.add_control(
@@ -123,6 +124,10 @@ class RespondBodyBuilder(MasonBuilder):
     
 #region Track
     def add_control_tracks(self , user):
+        """
+        Adds get control, which is used to get user tracks.
+        : param user: user model
+        """
         self.add_control(
             NAMESPACE_SHORT + ":tracks-of",
             href=url_for("api.trackcollection", user = user),
@@ -130,6 +135,10 @@ class RespondBodyBuilder(MasonBuilder):
             title="List track of users"
         )
     def add_control_add_track(self, user):
+        """
+        Adds add control, which is used to add user track.
+        : param user: user model
+        """
         self.add_control(
             NAMESPACE_SHORT + ":add-track",
             href=url_for("api.trackcollection", user = user),
@@ -140,6 +149,12 @@ class RespondBodyBuilder(MasonBuilder):
         )
 
     def add_control_edit_track(self, user, track):
+        """
+        Adds edit control, which is used to edit user track.
+        : param user: user model
+        : param track: track model
+
+        """
         self.add_control(
             NAMESPACE_SHORT + ":edit-track",
             url_for("api.trackitem", user=user, track = track),
@@ -152,6 +167,10 @@ class RespondBodyBuilder(MasonBuilder):
 
 #region Playlist
     def add_control_playlists(self , user):
+        """
+        Adds get control, which is used to edit user playlists.
+        : param user: user model
+        """
         self.add_control(
             NAMESPACE_SHORT + ":playlists-of",
             href=url_for("api.playlistcollection", user = user),
@@ -159,6 +178,10 @@ class RespondBodyBuilder(MasonBuilder):
             title="List playlists of users"
         )
     def add_control_add_playlist(self, user):
+        """
+        Adds add control, which is used to add user playlist.
+        : param user: user model
+        """
         self.add_control(
             NAMESPACE_SHORT + ":add-playlist",
             href=url_for("api.playlistcollection", user = user),
@@ -169,6 +192,11 @@ class RespondBodyBuilder(MasonBuilder):
         )
 
     def add_control_edit_playlist(self, user, playlist):
+        """
+        Adds edit control, which is used to edit user playlist.
+        : param user: user model
+        : param playlist: playlist model
+        """
         self.add_control(
             NAMESPACE_SHORT + ":edit-playlist",
             url_for("api.playlistitem", user=user, playlist = playlist),
@@ -181,6 +209,11 @@ class RespondBodyBuilder(MasonBuilder):
 
 #region Playlist_track
     def add_control_playlist_tracks(self , user, playlist):
+        """
+        Adds get control, which is used to edit user playlisttrack.
+        : param user: user model
+        : param playlist: playlist model
+        """
         self.add_control(
             NAMESPACE_SHORT + ":tracks_of_playlist",
             href=url_for("api.playlisttrackcollection", user = user, playlist = playlist),
@@ -188,6 +221,11 @@ class RespondBodyBuilder(MasonBuilder):
             title="List tracks of playlist of user"
         )
     def add_control_add_playlist_track(self, user, playlist):
+        """
+        Adds add control, which is used to add user playlisttrack.
+        : param user: user model
+        : param playlist: playlist model
+        """
         self.add_control(
             NAMESPACE_SHORT + ":add-playlisttrack",
             href=url_for("api.playlisttrackcollection",user = user, playlist = playlist),
@@ -198,6 +236,12 @@ class RespondBodyBuilder(MasonBuilder):
         )
 
     def add_control_edit_playlisttrack(self, user, playlist, playlist_track):
+        """
+        Adds edit control, which is used to edit user playlisttrack.
+        : param user: user model
+        : param playlist: playlist model
+        : param playlist_track: playlist_track model
+        """
         self.add_control(
             NAMESPACE_SHORT + ":edit-playlisttrack",
             url_for("api.playlisttrackitem", user=user, playlist = playlist, playlist_track = playlist_track),
@@ -222,18 +266,31 @@ class RespondBodyBuilder(MasonBuilder):
         )
 
 def is_validate_access_playlist(user , playlist):
+    """
+    Check if user own this playlist or not
+    : param playlist: playlist model
+    """
     if playlist not in user.playlists:
         return False
     return True
     
 
 def is_validate_access_track(user , track):
+    """
+    Check if user own this track or not
+    : param track: track model
+    """
     if track not in user.tracks:
         return False
     return True
     
 
 def is_validate_access_playlist_track(user , playlist , playlist_track):
+    """
+    Check if user can access write to this playlisttrack or not
+    : param playlist: playlist model
+    : param playlist_track: playlist_track model
+    """
     if not is_validate_access_playlist(user,playlist):
         return False
    
@@ -243,6 +300,9 @@ def is_validate_access_playlist_track(user , playlist , playlist_track):
 
     
 def require_admin(func):
+    """
+    Wrapper check if user have admin privilege
+    """
     def wrapper(*args, **kwargs):
         try:
             key_hash = AuthenticateKey.key_hash(request.headers.get("authenticate_key").strip())
@@ -256,6 +316,9 @@ def require_admin(func):
     return wrapper
 
 def require_user_key(func):
+    """
+    Wrapper check if user have right user privilege
+    """
     def wrapper(self, user, *args, **kwargs):
         try:
             key_hash = AuthenticateKey.key_hash(request.headers.get("authenticate_key").strip())

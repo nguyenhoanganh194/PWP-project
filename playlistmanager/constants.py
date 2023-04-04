@@ -7,4 +7,3 @@ USER_PROFILE = "/profiles/user/"
 TRACK_PROFILE = "/profiles/track/"
 PLAYLIST_PROFILE = "/profiles/playlist/"
 PLAYLIST_TRACK_PROFILE = "/profiles/playlist_track/"
-APIARY_URL = "https://{}.docs.apiary.io/#reference/".format(API_NAME)

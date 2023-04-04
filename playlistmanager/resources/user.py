@@ -68,7 +68,6 @@ class UserItem(Resource):
     204 with a successful PUT or DELETE
     301 if item's location changes
     400 if JSON validating fails
-    401 if invalid password
     404 if item was not found
     409 if item exists already
     415 if request is not JSON

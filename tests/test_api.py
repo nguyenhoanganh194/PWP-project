@@ -75,7 +75,7 @@ class TestUserResource(object):
             
             body = json.loads(resp.data)
             check_namespace(app,body)
-            check_control_get_method(app,"profile", body, 302)
+            check_control_get_method(app,"profile", body, 200)
             check_control_get_method(app,"collection", body)
             check_control_get_method(app,"self", body)
             check_control_get_method(app,"plm:tracks-of", body)
@@ -184,7 +184,7 @@ class TestPlaylistResource(object):
 
             
             check_namespace(app,body)
-            check_control_get_method(app,"profile", body, 302)
+            check_control_get_method(app,"profile", body, 200)
             check_control_get_method(app,"collection", body)
             check_control_get_method(app,"self", body)
 
@@ -285,7 +285,7 @@ class TestTrackResource(object):
             
             body = json.loads(resp.data)
             check_namespace(app,body)
-            check_control_get_method(app,"profile", body, 302)
+            check_control_get_method(app,"profile", body, 200)
             check_control_get_method(app,"collection", body)
             check_control_get_method(app,"self", body)
 
@@ -393,7 +393,7 @@ class TestPlaylistTrackResource(object):
             
             body = json.loads(resp.data)
             check_namespace(app,body)
-            check_control_get_method(app,"profile", body, 302)
+            check_control_get_method(app,"profile", body, 200)
             check_control_get_method(app,"collection", body)
             check_control_get_method(app,"self", body)
             check_control_get_method(app,"track", body)
@@ -447,7 +447,7 @@ def check_namespace(client, body):
     """
     ns_href = body["@namespaces"]["plm"]["name"]
     resp = client.get(ns_href)
-    assert resp.status_code == 302
+    assert resp.status_code == 200
 
 
 def check_control_get_method(client, ctrl, obj, code = 200):

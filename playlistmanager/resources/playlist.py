@@ -11,13 +11,19 @@ from playlistmanager.constants import *
 
 class PlaylistCollection(Resource):
     """
-    The TrackCollection resource supports ...
-    TODO: Write information for this
+    The PlaylistCollection resource supports GET and POST methods.
+    Possible response codes:
+    200 with a successful GET
+    201 with a successful POST
+    400 if JSON validating fails
+    409 if item exists already
+    415 if request is not JSON
     """
 
     def get(self, user):
         """
-        TODO: Write information for this
+        GET method for the PlaylistCollection. Lists user playlists
+        : param user: user model
         """
         body = RespondBodyBuilder()
         body.add_namespace(NAMESPACE_SHORT, LINK_RELATIONS_URL)
@@ -33,7 +39,8 @@ class PlaylistCollection(Resource):
 
     def post(self, user):
         """
-        TODO: Write information for this
+        POST method for the PlaylistCollection. Add new playlist to user playlists
+        : param user: user model
         """
 
         if not request.json:
@@ -57,12 +64,22 @@ class PlaylistCollection(Resource):
 
 class PlaylistItem(Resource):
     """
-    TODO: Write information for this
+    The PlaylistItem resource supports GET, PUT, and DELETE methods.
+    Possible response codes:
+    200 with a successful GET
+    204 with a successful PUT or DELETE
+    301 if item's location changes
+    400 if JSON validating fails
+    404 if item was not found
+    409 if item exists already
+    415 if request is not JSON
     """
 
     def get(self, user, playlist):
         """
-        TODO: Write information for this
+        GET method for the PlaylistItem. Get a PlaylistItem details information
+        : param user: user model
+        : param playlist: playlist model
         """
         if not is_validate_access_playlist(user,playlist):
             return create_error_response(409, "Not allow", "User not own playlist")
@@ -80,7 +97,9 @@ class PlaylistItem(Resource):
 
     def put(self,  user, playlist):
         """
-        TODO: Write information for this
+        PUT method for the PlaylistItem. Edit a PlaylistItem details information
+        : param user: user model
+        : param playlist: playlist model
         """
 
         status = 204
@@ -102,7 +121,9 @@ class PlaylistItem(Resource):
     
     def delete(self, user, playlist):
         """
-        TODO: Write information for this
+        PUT method for the PlaylistItem. Delete a PlaylistItem 
+        : param user: user model
+        : param playlist: playlist model
         """
         if not is_validate_access_playlist(user,playlist):
             return create_error_response(409, "Not allow", "User not own playlist")
