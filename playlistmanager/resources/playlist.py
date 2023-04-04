@@ -44,16 +44,15 @@ class PlaylistCollection(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
-        try:
-            playlist = Playlist()
-            playlist.deserialize(request.json)
-            playlist.user = user
-            db.session.add(playlist)
-            db.session.commit()
-            return Response(status=201, 
-                            headers={"Location": url_for("api.playlistitem", user=user, playlist = playlist)})       
-        except Exception as e:
-            return create_error_response(500, "Something's wrong.", str(e))
+       
+        playlist = Playlist()
+        playlist.deserialize(request.json)
+        playlist.user = user
+        db.session.add(playlist)
+        db.session.commit()
+        return Response(status=201, 
+                        headers={"Location": url_for("api.playlistitem", user=user, playlist = playlist)})       
+    
                                         
 
 class PlaylistItem(Resource):
@@ -95,28 +94,21 @@ class PlaylistItem(Resource):
         if not is_validate_access_playlist(user,playlist):
             return create_error_response(409, "Not allow", "User not own playlist")
 
-        
-        try:
-            status = 301
-            playlist.deserialize(request.json)
-            db.session.commit()
-            headers = {"Location": url_for("api.playlistitem", user = user, playlist = playlist)}
-            return Response(status=status, headers=headers)
-        except Exception as e:
-            return create_error_response(500, "Something's wrong.", str(e))
+        status = 301
+        playlist.deserialize(request.json)
+        db.session.commit()
+        headers = {"Location": url_for("api.playlistitem", user = user, playlist = playlist)}
+        return Response(status=status, headers=headers)
     
-    
-
     def delete(self, user, playlist):
         """
         TODO: Write information for this
         """
         if not is_validate_access_playlist(user,playlist):
             return create_error_response(409, "Not allow", "User not own playlist")
-        try:
-            db.session.delete(playlist)
-            db.session.commit()
-            return Response(status=204)
-        except Exception as e:
-            return create_error_response(500, "Something's wrong.", str(e))
+       
+        db.session.delete(playlist)
+        db.session.commit()
+        return Response(status=204)
+  
 

@@ -36,7 +36,8 @@ class UserCollection(Resource):
             item.add_control("profile", USER_PROFILE)
             body["items"].append(item)
         return Response(json.dumps(body), 200, mimetype=MASON)
-
+    
+    @require_admin
     def post(self):
         """
         POST method for the user collection. Adds a new user and includes the Location header
@@ -105,30 +106,28 @@ class UserItem(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
-        try:
-            new_user_name = request.json["user_name"]
+        
+        new_user_name = request.json["user_name"]
 
-            if user.user_name != new_user_name and User.query.filter_by(user_name=new_user_name).first():
-                return create_error_response(409, "Already exists", "Username'{}' already exists.".format(new_user_name))
+        if user.user_name != new_user_name and User.query.filter_by(user_name=new_user_name).first():
+            return create_error_response(409, "Already exists", "Username'{}' already exists.".format(new_user_name))
 
-            if user.user_name != new_user_name:
-                status = 301
-                
-            user.deserialize(request.json)
-            headers = {"Location": url_for("api.useritem", user = user)}
-            db.session.commit()
-            return Response(status=status, headers=headers)
-        except Exception as e:
-            return create_error_response(500, "Something's wrong.", str(e))
+        if user.user_name != new_user_name:
+            status = 301
+            
+        user.deserialize(request.json)
+        headers = {"Location": url_for("api.useritem", user = user)}
+        db.session.commit()
+        return Response(status=status, headers=headers)
+      
     
     @require_user_key
     def delete(self, user):
         """
         DELETE method for the user item. Deletes the resource. Requires api authentication.
         """
-        try:
-            db.session.delete(user)
-            db.session.commit()
-            return Response(status=204)
-        except Exception as e:
-            return create_error_response(500, "Something's wrong.", str(e))
+
+        db.session.delete(user)
+        db.session.commit()
+        return Response(status=204)
+        

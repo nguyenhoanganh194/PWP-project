@@ -7,11 +7,25 @@ from playlistmanager.models import User,Playlist,PlaylistTrack,Track, Authentica
 from .conftest import populate_test_db
 from jsf import JSF
 
+
 class TestUserResource(object):
     RESOURCE_URL = "/api/user/"
     valid_data = {'user_name': 'officiis ipsum, Lorem', 'password': 'culpa! repellendus accusantium'}
     invalid_data = {'user_name': 'officiis ipsum, Lorem'}
+    headers = {
+                "authenticate_key": "admin_token"
+    }
     @pytest.mark.usefixtures("client")
+    def test_entry_point(self,client):
+        with client.app_context():
+            app = client.test_client()
+            populate_test_db(db)
+            resp = app.get("/api/")
+            assert resp.status_code == 200
+            body = json.loads(resp.data)
+            check_namespace(app,body)
+            check_control_get_method(app,"plm:users-all", body)
+
     def test_get_collection(self, client):
         with client.app_context():
             app = client.test_client()
@@ -23,20 +37,31 @@ class TestUserResource(object):
             for item in body["items"]:
                 check_control_get_method(app,"self",item,200)
 
-            check_control_post_method(app,"plm:add-user", body)
+            check_control_post_method(app,"plm:add-user", body,api_key=self.headers["authenticate_key"])
 
     def test_post_collection(self, client):
         with client.app_context():
             app = client.test_client()
             populate_test_db(db)
-            resp = app.post(self.RESOURCE_URL,data=json.dumps(self.valid_data))
+            resp = app.post(self.RESOURCE_URL,headers = self.headers,data=json.dumps(self.valid_data))
             assert resp.status_code == 415
-            resp = app.post(self.RESOURCE_URL, json=self.valid_data)
-            assert resp.status_code == 201
-            resp = app.post(self.RESOURCE_URL, json=self.valid_data)
-            assert resp.status_code == 409
-            resp = app.post(self.RESOURCE_URL, json=self.invalid_data)
+            resp = app.post(self.RESOURCE_URL,headers = self.headers, json=self.invalid_data)
             assert resp.status_code == 400
+            resp = app.post(self.RESOURCE_URL,headers = self.headers, json=self.valid_data)
+            assert resp.status_code == 201
+
+
+        
+            headers = {
+                "authenticate_key": "User2"
+            }
+            resp = app.post(self.RESOURCE_URL,headers = headers, json=self.valid_data)
+            assert resp.status_code == 403
+
+            resp = app.post(self.RESOURCE_URL,headers = self.headers, json=self.valid_data)
+            assert resp.status_code == 409
+
+            
 
     def test_get_item(self, client):
         with client.app_context():
@@ -183,6 +208,9 @@ class TestPlaylistResource(object):
             resp = app.get(resp.headers.get("location"))
             assert resp.status_code == 200
             
+            resp = app.put(self.RESOURCE_URL + "User2/2/",json=self.valid_data)
+            assert resp.status_code == 409
+            
             self.valid_data["created_at"] = "Not date time"
             resp = app.put(self.RESOURCE_URL + "User1/2/",json=self.valid_data)
             assert resp.status_code == 400
@@ -190,15 +218,20 @@ class TestPlaylistResource(object):
             resp = app.put(self.RESOURCE_URL + "User1/2/",json=self.invalid_data)
             assert resp.status_code == 400
 
+
+
     def test_delete_item(self, client):
         with client.app_context():
             app = client.test_client()
             populate_test_db(db)
             resp = app.delete(self.RESOURCE_URL + "User1/1/")
             assert resp.status_code == 204
-
-            resp = app.delete(self.RESOURCE_URL + "User2/1")
+            
+            resp = app.delete(self.RESOURCE_URL + "User1/1/")
             assert resp.status_code == 404
+
+            resp = app.delete(self.RESOURCE_URL + "User2/2/")
+            assert resp.status_code == 409
            
 class TestTrackResource(object):
     RESOURCE_URL = "/api/track/"
@@ -276,8 +309,13 @@ class TestTrackResource(object):
             resp = app.get(resp.headers.get("location"))
             assert resp.status_code == 200
 
+            resp = app.put(self.RESOURCE_URL + "User3/3/",json=self.valid_data)
+            assert resp.status_code == 409
+
             resp = app.put(self.RESOURCE_URL + "User1/2/",json=self.invalid_datas[0])
             assert resp.status_code == 400
+
+
 
     def test_delete_item(self, client):
         with client.app_context():
@@ -288,6 +326,9 @@ class TestTrackResource(object):
 
             resp = app.delete(self.RESOURCE_URL + "User2/1")
             assert resp.status_code == 404
+
+            resp = app.delete(self.RESOURCE_URL + "User3/3/")
+            assert resp.status_code == 409
 
 class TestPlaylistTrackResource(object):
     RESOURCE_URL = "/api/playlist_track/"
@@ -311,6 +352,9 @@ class TestPlaylistTrackResource(object):
 
             check_control_post_method(client=app,ctrl="plm:add-playlisttrack", obj=body, body= self.valid_data)
 
+            resp = app.get(self.RESOURCE_URL + "User1/8/")
+            assert resp.status_code == 409
+
     def test_post_collection(self, client):
         with client.app_context():
             app = client.test_client()
@@ -322,6 +366,14 @@ class TestPlaylistTrackResource(object):
             assert resp.status_code == 201
             resp = app.get(resp.headers.get("location"))
             assert resp.status_code == 200
+
+            valid_data = {'track_id': 10, 'playlist_id': 1, 'track_number': 2}
+            resp = app.post(self.RESOURCE_URL + "User1/1/", json=valid_data)
+            assert resp.status_code == 409
+
+            valid_data = {'track_id': 1, 'playlist_id': 1, 'track_number': 2}
+            resp = app.post(self.RESOURCE_URL + "User1/8/", json=valid_data)
+            assert resp.status_code == 409
 
             for invalid_data in self.invalid_datas:
                 resp = app.post(self.RESOURCE_URL + "User1/1/", json=invalid_data)
@@ -369,6 +421,10 @@ class TestPlaylistTrackResource(object):
             resp = app.put(self.RESOURCE_URL + "User1/1/1/",json=self.invalid_datas[0])
             assert resp.status_code == 400
 
+            resp = app.put(self.RESOURCE_URL + "User1/4/3/",json=self.valid_data)
+            assert resp.status_code == 409
+
+
     def test_delete_item(self, client):
         with client.app_context():
             app = client.test_client()
@@ -376,8 +432,11 @@ class TestPlaylistTrackResource(object):
             resp = app.delete(self.RESOURCE_URL + "User1/1/1/")
             assert resp.status_code == 204
 
-            resp = app.delete(self.RESOURCE_URL + "User2/1/1")
+            resp = app.delete(self.RESOURCE_URL + "User1/1/1/")
             assert resp.status_code == 404
+
+            resp = app.delete(self.RESOURCE_URL + "User1/2/3/")
+            assert resp.status_code == 409
 
 
 def check_namespace(client, body):

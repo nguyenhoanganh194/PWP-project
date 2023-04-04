@@ -258,31 +258,25 @@ class RespondBodyBuilder(MasonBuilder):
         )
 
 def is_validate_access_playlist(user , playlist):
-    try:
-        if playlist not in user.playlists:
-            return False
-        return True
-    except:
+    if playlist not in user.playlists:
         return False
+    return True
     
 
 def is_validate_access_track(user , track):
-    try:
-        if track not in user.tracks:
-            return False
-        return True
-    except:
+    if track not in user.tracks:
         return False
+    return True
+    
 
 def is_validate_access_playlist_track(user , playlist , playlist_track):
     if not is_validate_access_playlist(user,playlist):
         return False
-    try:
-        if playlist_track not in playlist.playlist_tracks:
-            return False
-        return True
-    except:
+   
+    if playlist_track not in playlist.playlist_tracks:
         return False
+    return True
+
     
 def require_admin(func):
     def wrapper(*args, **kwargs):

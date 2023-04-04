@@ -44,16 +44,15 @@ class TrackCollection(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
-        try:
-            track = Track()
-            track.deserialize(request.json)
-            track.user = user
-            db.session.add(track)
-            db.session.commit()
-            return Response(status=201, 
-                            headers={"Location": url_for("api.trackitem", user=user, track = track)})       
-        except Exception as e:
-            return create_error_response(500, "Something's wrong.", str(e))
+        
+        track = Track()
+        track.deserialize(request.json)
+        track.user = user
+        db.session.add(track)
+        db.session.commit()
+        return Response(status=201, 
+                        headers={"Location": url_for("api.trackitem", user=user, track = track)})       
+        
                                         
 
 class TrackItem(Resource):
@@ -95,16 +94,13 @@ class TrackItem(Resource):
         if not is_validate_access_track(user,track):
             return create_error_response(409, "Not allow", "User not own track")
 
-        try:
-            status = 301
-            track.deserialize(request.json)
-            db.session.commit()
-            headers = {"Location": url_for("api.trackitem", user = user, track = track)}
-            return Response(status=status, headers=headers)
-        except Exception as e:
-            return create_error_response(500, "Something's wrong.", str(e))
-    
-    
+
+        status = 301
+        track.deserialize(request.json)
+        db.session.commit()
+        headers = {"Location": url_for("api.trackitem", user = user, track = track)}
+        return Response(status=status, headers=headers)
+       
 
     def delete(self, user, track):
         """
@@ -112,10 +108,9 @@ class TrackItem(Resource):
         """
         if not is_validate_access_track(user,track):
             return create_error_response(409, "Not allow", "User not own track")
-        try:
-            db.session.delete(track)
-            db.session.commit()
-            return Response(status=204)
-        except Exception as e:
-            return create_error_response(500, "Something's wrong.", str(e))
+
+        db.session.delete(track)
+        db.session.commit()
+        return Response(status=204)
+
     
