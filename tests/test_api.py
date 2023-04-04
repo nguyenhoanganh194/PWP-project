@@ -200,10 +200,14 @@ class TestPlaylistResource(object):
             resp = app.delete(self.RESOURCE_URL + "User2/1")
             assert resp.status_code == 404
            
-class TestPlaylistResource(object):
-    RESOURCE_URL = "/api/playlist/"
-    valid_data = {'name': 'officiis ipsum, Lorem', 'created_at':  "1973-01-04T22:23:29+00:00" }
-    invalid_data = {'name': 'officiis ipsum, Lorem'}
+class TestTrackResource(object):
+    RESOURCE_URL = "/api/track/"
+    valid_data = {'name': 'reiciendis Hic molestias, illum dolor dolor elit.', 'artist': 'culpa! exercitationem', 'duration': 5811.0}
+    invalid_datas = [ 
+        {'name': 'reiciendis Hic molestias, illum dolor dolor elit.', 'duration': 5811.0},
+        {'name': 'reiciendis Hic molestias, illum dolor dolor elit.', 'artist': 'culpa! exercitationem'}
+    ]
+   
     @pytest.mark.usefixtures("client")
     def test_get_collection(self, client):
         with client.app_context():
@@ -216,7 +220,7 @@ class TestPlaylistResource(object):
             for item in body["items"]:
                 check_control_get_method(app,"self",item,200)
 
-            check_control_post_method(app,"plm:add-playlist", body)
+            check_control_post_method(app,"plm:add-track", body)
 
     def test_post_collection(self, client):
         with client.app_context():
@@ -230,8 +234,9 @@ class TestPlaylistResource(object):
             resp = app.get(resp.headers.get("location"))
             assert resp.status_code == 200
 
-            resp = app.post(self.RESOURCE_URL + "User1/", json=self.invalid_data)
-            assert resp.status_code == 400
+            for invalid_data in self.invalid_datas:
+                resp = app.post(self.RESOURCE_URL + "User1/", json=invalid_data)
+                assert resp.status_code == 400
 
     def test_get_item(self, client):
         with client.app_context():
@@ -249,7 +254,7 @@ class TestPlaylistResource(object):
             check_control_get_method(app,"collection", body)
             check_control_get_method(app,"self", body)
 
-            check_control_put_method(app,"plm:edit-playlist", body)
+            check_control_put_method(app,"plm:edit-track", body)
             
             resp = app.get(self.RESOURCE_URL + "User1/2/")
             body = json.loads(resp.data)
@@ -270,12 +275,8 @@ class TestPlaylistResource(object):
             assert resp.status_code == 301
             resp = app.get(resp.headers.get("location"))
             assert resp.status_code == 200
-            
-            self.valid_data["created_at"] = "Not date time"
-            resp = app.put(self.RESOURCE_URL + "User1/2/",json=self.valid_data)
-            assert resp.status_code == 400
 
-            resp = app.put(self.RESOURCE_URL + "User1/2/",json=self.invalid_data)
+            resp = app.put(self.RESOURCE_URL + "User1/2/",json=self.invalid_datas[0])
             assert resp.status_code == 400
 
     def test_delete_item(self, client):
