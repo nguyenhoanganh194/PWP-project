@@ -123,10 +123,6 @@ class RespondBodyBuilder(MasonBuilder):
     
 #region Track
     def add_control_tracks(self , user):
-        """
-        TODO: fill description for this
-        """
-
         self.add_control(
             NAMESPACE_SHORT + ":tracks-of",
             href=url_for("api.trackcollection", user = user),
@@ -134,10 +130,6 @@ class RespondBodyBuilder(MasonBuilder):
             title="List track of users"
         )
     def add_control_add_track(self, user):
-        """
-        TODO: fill description for this
-        """
-
         self.add_control(
             NAMESPACE_SHORT + ":add-track",
             href=url_for("api.trackcollection", user = user),
@@ -148,10 +140,6 @@ class RespondBodyBuilder(MasonBuilder):
         )
 
     def add_control_edit_track(self, user, track):
-        """
-           TODO: fill description for this
-        """
-
         self.add_control(
             NAMESPACE_SHORT + ":edit-track",
             url_for("api.trackitem", user=user, track = track),
@@ -164,10 +152,6 @@ class RespondBodyBuilder(MasonBuilder):
 
 #region Playlist
     def add_control_playlists(self , user):
-        """
-        TODO: fill description for this
-        """
-
         self.add_control(
             NAMESPACE_SHORT + ":playlists-of",
             href=url_for("api.playlistcollection", user = user),
@@ -175,10 +159,6 @@ class RespondBodyBuilder(MasonBuilder):
             title="List playlists of users"
         )
     def add_control_add_playlist(self, user):
-        """
-        TODO: fill description for this
-        """
-
         self.add_control(
             NAMESPACE_SHORT + ":add-playlist",
             href=url_for("api.playlistcollection", user = user),
@@ -189,10 +169,6 @@ class RespondBodyBuilder(MasonBuilder):
         )
 
     def add_control_edit_playlist(self, user, playlist):
-        """
-           TODO: fill description for this
-        """
-
         self.add_control(
             NAMESPACE_SHORT + ":edit-playlist",
             url_for("api.playlistitem", user=user, playlist = playlist),
@@ -205,10 +181,6 @@ class RespondBodyBuilder(MasonBuilder):
 
 #region Playlist_track
     def add_control_playlist_tracks(self , user, playlist):
-        """
-        TODO: fill description for this
-        """
-
         self.add_control(
             NAMESPACE_SHORT + ":tracks_of_playlist",
             href=url_for("api.playlisttrackcollection", user = user, playlist = playlist),
@@ -216,10 +188,6 @@ class RespondBodyBuilder(MasonBuilder):
             title="List tracks of playlist of user"
         )
     def add_control_add_playlist_track(self, user, playlist):
-        """
-        TODO: fill description for this
-        """
-
         self.add_control(
             NAMESPACE_SHORT + ":add-playlisttrack",
             href=url_for("api.playlisttrackcollection",user = user, playlist = playlist),
@@ -230,10 +198,6 @@ class RespondBodyBuilder(MasonBuilder):
         )
 
     def add_control_edit_playlisttrack(self, user, playlist, playlist_track):
-        """
-           TODO: fill description for this
-        """
-
         self.add_control(
             NAMESPACE_SHORT + ":edit-playlisttrack",
             url_for("api.playlisttrackitem", user=user, playlist = playlist, playlist_track = playlist_track),

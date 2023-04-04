@@ -126,7 +126,6 @@ class UserItem(Resource):
         """
         DELETE method for the user item. Deletes the resource. Requires api authentication.
         """
-
         db.session.delete(user)
         db.session.commit()
         return Response(status=204)

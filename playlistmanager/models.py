@@ -56,9 +56,6 @@ class User(db.Model):
 class Playlist(db.Model):
     """
     The Playlist model defines a playlist of the API.
-    "name" has to be alphanumeric string that can contain spaces, but no other special chars.
-    TODO: fill description for each fields.
-    "created_at" is ...
     """
 
     __tablename__ = 'playlist'
@@ -69,7 +66,6 @@ class Playlist(db.Model):
       
     user = db.relationship('User', back_populates = "playlists")
     playlist_tracks = db.relationship("PlaylistTrack", cascade="all, delete-orphan", back_populates="playlist")
-    #TODO:add track in playlist relation ship
     def serialize(self):
         return {
             "id": self.id,
@@ -106,7 +102,6 @@ class Playlist(db.Model):
 class Track(db.Model):
     """
     The Track model defines a Track of the API.
-    TODO: fill description for each fields.
     """
 
     __tablename__ = 'track'
@@ -156,7 +151,6 @@ class Track(db.Model):
 class PlaylistTrack(db.Model):
     """
     The PlaylistTrack model defines a PlaylistTrack of the API.
-    TODO: fill description for each fields.
     """
 
     __tablename__ = 'playlist_track'
@@ -204,7 +198,6 @@ class PlaylistTrack(db.Model):
 class AuthenticateKey(db.Model):
     """
     The PlaylistTrack model defines a PlaylistTrack of the API.
-    TODO: fill description for each fields.
     """
     key = db.Column(db.String(32), nullable=False, unique=True,primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
