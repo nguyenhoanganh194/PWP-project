@@ -193,6 +193,10 @@ class PlaylistTrack(db.Model):
             "description": "track_id",
             "type": "number",
         }
+        props["playlist_id"] = {
+            "description": "playlist_id",
+            "type": "number",
+        }
         props["track_number"] = {
             "description": "track_number",
             "type": "number",

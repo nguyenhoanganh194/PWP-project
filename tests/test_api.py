@@ -288,7 +288,96 @@ class TestTrackResource(object):
 
             resp = app.delete(self.RESOURCE_URL + "User2/1")
             assert resp.status_code == 404
-#TODO: do same thing for 3 other resource.
+
+class TestPlaylistTrackResource(object):
+    RESOURCE_URL = "/api/playlist_track/"
+    valid_data = {'track_id': 1, 'playlist_id': 1, 'track_number': 2}
+    invalid_datas = [ 
+        {'track_id': 1, 'track_number': 2},
+        {'track_id': 1, 'playlist_id': 1}
+    ]
+   
+    @pytest.mark.usefixtures("client")
+    def test_get_collection(self, client):
+        with client.app_context():
+            app = client.test_client()
+            populate_test_db(db)
+            resp = app.get(self.RESOURCE_URL + "User1/1/")
+            assert resp.status_code == 200
+            body = json.loads(resp.data)
+            check_namespace(app,body)
+            for item in body["items"]:
+                check_control_get_method(app,"self",item,200)
+
+            check_control_post_method(client=app,ctrl="plm:add-playlisttrack", obj=body, body= self.valid_data)
+
+    def test_post_collection(self, client):
+        with client.app_context():
+            app = client.test_client()
+            populate_test_db(db)
+            resp = app.post(self.RESOURCE_URL + "User1/1/",data=json.dumps(self.valid_data))
+            assert resp.status_code == 415
+
+            resp = app.post(self.RESOURCE_URL + "User1/1/", json=self.valid_data)
+            assert resp.status_code == 201
+            resp = app.get(resp.headers.get("location"))
+            assert resp.status_code == 200
+
+            for invalid_data in self.invalid_datas:
+                resp = app.post(self.RESOURCE_URL + "User1/1/", json=invalid_data)
+                assert resp.status_code == 400
+
+    def test_get_item(self, client):
+        with client.app_context():
+            app = client.test_client()
+            populate_test_db(db)
+
+            resp = app.get(self.RESOURCE_URL + "User1/1/100/")
+            assert resp.status_code == 404
+            resp = app.get(self.RESOURCE_URL + "User1/1/1/")
+            assert resp.status_code == 200
+            
+            body = json.loads(resp.data)
+            check_namespace(app,body)
+            check_control_get_method(app,"profile", body, 302)
+            check_control_get_method(app,"collection", body)
+            check_control_get_method(app,"self", body)
+
+            check_control_put_method(app,"plm:edit-playlisttrack", obj=body,body= self.valid_data)
+            
+            resp = app.get(self.RESOURCE_URL + "User1/1/2/")
+            body = json.loads(resp.data)
+            check_control_delete_method(app,"plm:delete", body)
+
+            resp = app.get(self.RESOURCE_URL + "User1/1/10/")
+            assert resp.status_code == 409
+
+
+    def test_put_item(self, client):
+        with client.app_context():
+            app = client.test_client()
+            populate_test_db(db)
+
+            resp = app.put(self.RESOURCE_URL + "User1/1/1/",data=json.dumps(self.valid_data))
+            assert resp.status_code == 415
+            resp = app.put(self.RESOURCE_URL + "User1/1/1/",json=self.valid_data)
+            assert resp.status_code == 301
+            resp = app.get(resp.headers.get("location"))
+            assert resp.status_code == 200
+
+            resp = app.put(self.RESOURCE_URL + "User1/1/1/",json=self.invalid_datas[0])
+            assert resp.status_code == 400
+
+    def test_delete_item(self, client):
+        with client.app_context():
+            app = client.test_client()
+            populate_test_db(db)
+            resp = app.delete(self.RESOURCE_URL + "User1/1/1/")
+            assert resp.status_code == 204
+
+            resp = app.delete(self.RESOURCE_URL + "User2/1/1")
+            assert resp.status_code == 404
+
 
 def check_namespace(client, body):
     """
@@ -309,7 +398,7 @@ def check_control_get_method(client, ctrl, obj, code = 200):
     resp = client.get(href)
     assert resp.status_code == code
 
-def check_control_post_method(client, ctrl, obj,api_key = "", expect_code = 201):
+def check_control_post_method(client, ctrl, obj ,api_key = "", body = None, expect_code = 201):
     """
     Checks a POST type control from a JSON object be it root document or an item
     in a collection. In addition to checking the "href" attribute, also checks
@@ -326,16 +415,19 @@ def check_control_post_method(client, ctrl, obj,api_key = "", expect_code = 201)
     schema = ctrl_obj["schema"]
     assert method == "post"
     assert encoding == "json"
-    faker = JSF(schema)
-    body = faker.generate()
     headers = {
         "Content-Type": "application/json; charset=utf-8;",
         "authenticate_key": api_key
     }
+    if body == None:
+        faker = JSF(schema)
+        body = faker.generate()
+   
     resp = client.post(href, headers = headers,json=body)
     assert resp.status_code == expect_code
 
-def check_control_put_method(client, ctrl, obj, api_key = "", expect_code = 301):
+
+def check_control_put_method(client, ctrl, obj, api_key = "", body = None, expect_code = 301):
     """
     Checks a PUT type control from a JSON object be it root document or an item
     in a collection. In addition to checking the "href" attribute, also checks
@@ -351,12 +443,13 @@ def check_control_put_method(client, ctrl, obj, api_key = "", expect_code = 301)
     schema = ctrl_obj["schema"]
     assert method == "put"
     assert encoding == "json"
-    faker = JSF(schema)
-    body = faker.generate()
     headers = {
         "Content-Type": "application/json; charset=utf-8;",
         "authenticate_key": api_key
     }
+    if body == None:
+        faker = JSF(schema)
+        body = faker.generate()
     resp = client.put(href, headers = headers,json=body)
     assert resp.status_code == expect_code
 
