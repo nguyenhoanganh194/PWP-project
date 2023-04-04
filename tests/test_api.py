@@ -74,6 +74,7 @@ class TestUserResource(object):
             assert resp.status_code == 200
             
             body = json.loads(resp.data)
+            print(body)
             check_namespace(app,body)
             check_control_get_method(app,"profile", body, 302)
             check_control_get_method(app,"collection", body)
@@ -181,6 +182,8 @@ class TestPlaylistResource(object):
             assert resp.status_code == 200
             
             body = json.loads(resp.data)
+
+            
             check_namespace(app,body)
             check_control_get_method(app,"profile", body, 302)
             check_control_get_method(app,"collection", body)
@@ -437,7 +440,6 @@ class TestPlaylistTrackResource(object):
 
             resp = app.delete(self.RESOURCE_URL + "User1/2/3/")
             assert resp.status_code == 409
-
 
 def check_namespace(client, body):
     """

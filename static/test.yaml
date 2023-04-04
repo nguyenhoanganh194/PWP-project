@@ -1,0 +1,348 @@
+openapi: 3.0.3
+info:
+  title: Playlist manager
+  version: 0.0.1
+  description: |
+    This is an API example used in the Programmable Web Project course.
+    It stores data about recipes and ingredients.
+  termsOfService: http://totally.not.placehold.er/
+  contact:
+    url: http://test-not-placeholder.com/
+    email: anhnguyen22@oulu.student.fi
+    name: Anh Nguyen Hoang
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+- url: /api
+paths:
+  /user/:
+    get:
+      description: Get the collection of users
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              example:
+              - user_name: user_1
+                password: user_1_password
+              - user_name: user_2
+                password: user_2_password
+    post:
+      description: Create a new user. Require admin key
+      responses:
+        '201':
+          description: The user was created successfully
+          headers:
+            Location:
+              description: URI of the new user
+              schema:
+                type: string
+        '400':
+          description: Json is not valid
+        '409':
+          description: User already exists
+        '415':
+          description: Request content type must be JSON
+      requestBody:
+        description: JSON document that contains basic data for a user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+            example:
+              user_name: user_1
+              password: user_1_password
+  /user/{user}/:
+    parameters:
+    - $ref: '#/components/parameters/user'
+    get:
+      description: Get details of one user
+      responses:
+        '201':
+          description: User data received
+          content:
+            application/json:
+              examples:
+                existing-user:
+                  description: User name
+                  value:
+                    user_name: user_1
+    put:
+      description: Modify details of one user. Require that user auth key
+      responses:
+        '301':
+          description: Edit properties of the user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+            example:
+              user_name: user_1
+              password: user_1_password
+    delete:
+      description: Delete one user. Require that user auth key
+      responses:
+        '204':
+          description: Delete completed
+          content:
+            application/json:
+              examples:
+                existing-user:
+                  description: Existing user that has been created previously
+        '404':
+          description: The user was not found
+  /playlist/{user}/:
+    parameters:
+    - $ref: '#/components/parameters/user'
+    get:
+      description: Get the playlist collection of a user
+      responses:
+        '200':
+          description: List of playlist
+          content:
+            application/json:
+              example:
+                - name: playlist_1
+                  created_at: 2020-01-04T22:22:29+00:00
+                - name: playlist_2
+                  created_at: 2021-01-04T22:23:29+00:00
+    post:
+      description: Create a new playlist for a user
+      responses:
+        '201':
+          description: Create play successful
+          headers:
+            Location:
+              description: URI of the new playlist
+              schema:
+                type: string
+        '400':
+          description: Json data is not correct
+        '415':
+          description: Request content type must be JSON
+      requestBody:
+        description: JSON document that contains basic data for a playlist
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Playlist'
+            example:
+              name: playlist_1
+              created_at: 2020-01-04T22:22:29+00:00
+  /playlist/{user}/{playlist id}:
+    parameters:
+    - $ref: '#/components/parameters/user'
+    - $ref: '#/components/parameters/playlist'
+    get:
+      description: Get details of one playlist
+      responses:
+        '201':
+          description: Information about the playlist
+          content:
+            application/json:
+              examples:
+                existing-playlist:
+                  description: Existing playlist that has been created previously
+                  value:
+                    name: playlist_1
+                    created_at: 2020-01-04T22:22:29+00:00
+    put:
+      description: Modify details of one playlist.
+      responses:
+        '204':
+          description: Modify successful
+        '409':
+          description: The user not own that playlist 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Playlist'
+            example:
+              name: playlist_2
+              created_at: 2021-01-04T22:23:29+00:00
+    delete:
+      description: Delete one playlist
+      responses:
+        '204':
+          description: Delete successful
+          content:
+            application/json:
+              examples:
+                existing-recipe:
+                  description: Existing playlist that has been created previously
+        '404':
+          description: The playlist was not found
+        '409':
+          description: The user not own that playlist  
+
+  /track/{user}/:
+    parameters:
+    - $ref: '#/components/parameters/user'
+    get:
+      description: Get the track collection of a user
+      responses:
+        '200':
+          description: List of track
+          content:
+            application/json:
+              example:
+                - name: playlist_1
+                  created_at: 2020-01-04T22:22:29+00:00
+                - name: playlist_2
+                  created_at: 2021-01-04T22:23:29+00:00
+    post:
+      description: Create a new playlist for a user
+      responses:
+        '201':
+          description: Create play successful
+          headers:
+            Location:
+              description: URI of the new playlist
+              schema:
+                type: string
+        '400':
+          description: Json data is not correct
+        '415':
+          description: Request content type must be JSON
+      requestBody:
+        description: JSON document that contains basic data for a playlist
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Playlist'
+            example:
+              name: playlist_1
+              created_at: 2020-01-04T22:22:29+00:00
+              
+  /playlist/{user}/{playlist id}:
+    parameters:
+    - $ref: '#/components/parameters/user'
+    - $ref: '#/components/parameters/playlist'
+    get:
+      description: Get details of one playlist
+      responses:
+        '201':
+          description: Information about the playlist
+          content:
+            application/json:
+              examples:
+                existing-playlist:
+                  description: Existing playlist that has been created previously
+                  value:
+                    name: playlist_1
+                    created_at: 2020-01-04T22:22:29+00:00
+    put:
+      description: Modify details of one playlist.
+      responses:
+        '204':
+          description: Modify successful
+        '409':
+          description: The user not own that playlist 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Playlist'
+            example:
+              name: playlist_2
+              created_at: 2021-01-04T22:23:29+00:00
+    delete:
+      description: Delete one playlist
+      responses:
+        '204':
+          description: Delete successful
+          content:
+            application/json:
+              examples:
+                existing-recipe:
+                  description: Existing playlist that has been created previously
+        '404':
+          description: The playlist was not found
+        '409':
+          description: The user not own that playlist            
+
+          
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        user_name:
+          description: user name
+          type: string
+        password:
+          description: user password
+          type: string
+        
+      required:
+      - user_name
+      - password
+      
+    Playlist:
+      type: object
+      properties:
+        name:
+          description: Name of the playlist
+          type: string
+        created_at:
+          description: Date created
+          type: string
+      required:
+        - name
+        - created_at
+        
+    Track:
+      type: object
+      properties:
+        name:
+          description: Name of the track
+          type: string
+        artist:
+          description: Track's artist
+          type: string
+        duration:
+          description: Track's duration
+          type: number
+      required:
+        - name
+        - artist
+        - duration 
+        
+  parameters:
+    user:
+      description: username
+      in: path
+      name: user
+      required: true
+      schema:
+        type: string
+    track:
+      description: track id
+      in: path
+      name: track id
+      required: true
+      schema:
+        type: number
+    playlist:
+      description: playlist id
+      in: path
+      name: playlist id
+      required: true
+      schema:
+        type: number
+    playlisttrack:
+      description: playlist track id
+      in: path
+      name: playlist track id
+      required: true
+      schema:
+        type: number
+  securitySchemes:
+      recipeKey:
+        type: apiKey
+        name: user or admin api key
+        in: header
