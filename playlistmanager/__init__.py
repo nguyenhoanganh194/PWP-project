@@ -1,6 +1,6 @@
 
 import os
-from flask import Flask, redirect
+from flask import Flask, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy
 
 from playlistmanager.constants import *
@@ -8,7 +8,7 @@ from playlistmanager.constants import *
 db = SQLAlchemy()
 
 def create_app(test_config=None):
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__, instance_relative_config=True, static_folder="static")
     app.config.from_mapping(
         SECRET_KEY="hello",
         SQLALCHEMY_DATABASE_URI="sqlite:///" + os.path.join(app.instance_path, "dev.db"),
@@ -41,6 +41,16 @@ def create_app(test_config=None):
     @app.route(LINK_RELATIONS_URL)
     def redirect_link_relations():
         return redirect(APIARY_URL + "link-relations")
+    
+
+    @app.route("/")
+    def redirect_swagger_ui():
+        return render_template('swaggerui.html')
+    
+    @app.route("/JsonYaml")
+    def get_yaml_json():
+        return render_template('swaggerui.html')
+    
     
     @app.route("/profiles/<profile>/")
     def redirect_profiles(profile):

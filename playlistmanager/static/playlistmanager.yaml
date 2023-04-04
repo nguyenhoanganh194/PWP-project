@@ -450,7 +450,7 @@ components:
       schema:
         type: number
   securitySchemes:
-      recipeKey:
+      apiKey:
         type: apiKey
         name: user or admin api key
         in: header
