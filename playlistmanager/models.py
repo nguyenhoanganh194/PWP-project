@@ -231,7 +231,7 @@ def init_db_command():
 @with_appcontext
 def populate_db_command():
     """
-    Populates an initialized but empty database with some test values.
+    Populates an initialized but empty database with admin key.
     raises IntegrityError: If the database contains the data already
     raises OperationalError: If the database is not initialized
     """
@@ -252,50 +252,6 @@ def populate_db_command():
             admin=True
         )
         db.session.add(db_key)
-        user = {}
-        for i in range(1, 4):
-            user[i] = User(
-                user_name="User{}".format(i),
-                password="password{}".format(i),
-            )
-            db.session.add(user[i])
-            playlist = {}
-            for j in range(1, 4):
-                playlist[j] = Playlist(
-                    name="Playlist{}".format(j),
-                    created_at = datetime.now(),
-                    user = user[i]
-                )
-                db.session.add(playlist[j])
-
-            track = {}
-            for j in range(1, 4):
-                track[j] = Track(
-                    name="Track{}".format(j),
-                    artist ="Artist{}".format(j),
-                    duration = 100*j,
-                    user = user[i]
-                )
-                db.session.add(track[j])
-            
-            for j in range(1, 4):
-                playlist_track = {}
-                for k in range(1, 4):
-                    playlist_track[j] = PlaylistTrack(
-                        track_number= j + k,
-                        playlist =playlist[j],
-                        track = track[j],
-                    )
-                    db.session.add(playlist_track[j])
-
-        key = {}
-        for i in range(1, 4):        
-            key[i] = AuthenticateKey(
-                key=AuthenticateKey.key_hash("User{}".format(i)),
-                admin = False,
-                user=user[i],
-            )
-            db.session.add(key[i])
         db.session.commit()
     except IntegrityError:
         print("Failed to populate the database. Database must be empty.")
