@@ -1,5 +1,5 @@
 import json
-from jsonschema import validate, ValidationError
+from jsonschema import FormatChecker, validate, ValidationError
 from flask import Response, request, url_for
 from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
@@ -40,7 +40,7 @@ class PlaylistCollection(Resource):
             return create_error_response(415, "Unsupported media type", "Requests must be JSON")
 
         try:
-            validate(request.json, Playlist.get_schema())
+            validate(request.json, Playlist.get_schema(),format_checker=FormatChecker())
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
@@ -88,13 +88,14 @@ class PlaylistItem(Resource):
         if not request.json:
             return create_error_response(415, "Unsupported media type", "Requests must be JSON")
         try:
-            validate(request.json, Playlist.get_schema())
+            validate(request.json, Playlist.get_schema(),format_checker=FormatChecker())
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
         if not is_validate_access_playlist(user,playlist):
             return create_error_response(409, "Not allow", "User not own playlist")
 
+        
         try:
             status = 301
             playlist.deserialize(request.json)

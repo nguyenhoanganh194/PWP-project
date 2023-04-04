@@ -45,7 +45,6 @@ class User(db.Model):
         props["user_name"] = {
             "description": "User's name",
             "type": "string",
-            # "pattern": "^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$"
         }
         props["password"] = {
             "description": "User's password",
@@ -95,7 +94,6 @@ class Playlist(db.Model):
         props["name"] = {
             "description": "Playlist name",
             "type": "string",
-            "pattern": "^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$"
         }
         props["created_at"] = {
             "description": "Date time created",
@@ -145,12 +143,10 @@ class Track(db.Model):
         props["name"] = {
             "description": "Track name",
             "type": "string",
-            "pattern": "^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$"
         }
         props["artist"] = {
             "description": "Artist name",
             "type": "string",
-            "pattern": "^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$"
         }
         props["duration"] = {
             "description": "Duration",

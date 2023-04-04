@@ -1,3 +1,4 @@
+import datetime
 import secrets
 import pytest
 import json
@@ -111,7 +112,181 @@ class TestUserResource(object):
             resp = app.delete(self.RESOURCE_URL + "User2/")
             assert resp.status_code == 403
            
+class TestPlaylistResource(object):
+    RESOURCE_URL = "/api/playlist/"
+    valid_data = {'name': 'officiis ipsum, Lorem', 'created_at':  "1973-01-04T22:23:29+00:00" }
+    invalid_data = {'name': 'officiis ipsum, Lorem'}
+    @pytest.mark.usefixtures("client")
+    def test_get_collection(self, client):
+        with client.app_context():
+            app = client.test_client()
+            populate_test_db(db)
+            resp = app.get(self.RESOURCE_URL + "User1/")
+            assert resp.status_code == 200
+            body = json.loads(resp.data)
+            check_namespace(app,body)
+            for item in body["items"]:
+                check_control_get_method(app,"self",item,200)
 
+            check_control_post_method(app,"plm:add-playlist", body)
+
+    def test_post_collection(self, client):
+        with client.app_context():
+            app = client.test_client()
+            populate_test_db(db)
+            resp = app.post(self.RESOURCE_URL + "User1/",data=json.dumps(self.valid_data))
+            assert resp.status_code == 415
+
+            resp = app.post(self.RESOURCE_URL + "User1/", json=self.valid_data)
+            assert resp.status_code == 201
+            resp = app.get(resp.headers.get("location"))
+            assert resp.status_code == 200
+
+            resp = app.post(self.RESOURCE_URL + "User1/", json=self.invalid_data)
+            assert resp.status_code == 400
+
+    def test_get_item(self, client):
+        with client.app_context():
+            app = client.test_client()
+            populate_test_db(db)
+
+            resp = app.get(self.RESOURCE_URL + "User1/10/")
+            assert resp.status_code == 404
+            resp = app.get(self.RESOURCE_URL + "User1/1/")
+            assert resp.status_code == 200
+            
+            body = json.loads(resp.data)
+            check_namespace(app,body)
+            check_control_get_method(app,"profile", body, 302)
+            check_control_get_method(app,"collection", body)
+            check_control_get_method(app,"self", body)
+
+            check_control_put_method(app,"plm:edit-playlist", body)
+            
+            resp = app.get(self.RESOURCE_URL + "User1/2/")
+            body = json.loads(resp.data)
+            check_control_delete_method(app,"plm:delete", body)
+
+            resp = app.get(self.RESOURCE_URL + "User3/3/")
+            assert resp.status_code == 409
+
+
+    def test_put_item(self, client):
+        with client.app_context():
+            app = client.test_client()
+            populate_test_db(db)
+
+            resp = app.put(self.RESOURCE_URL + "User1/1/",data=json.dumps(self.valid_data))
+            assert resp.status_code == 415
+            resp = app.put(self.RESOURCE_URL + "User1/1/",json=self.valid_data)
+            assert resp.status_code == 301
+            resp = app.get(resp.headers.get("location"))
+            assert resp.status_code == 200
+            
+            self.valid_data["created_at"] = "Not date time"
+            resp = app.put(self.RESOURCE_URL + "User1/2/",json=self.valid_data)
+            assert resp.status_code == 400
+
+            resp = app.put(self.RESOURCE_URL + "User1/2/",json=self.invalid_data)
+            assert resp.status_code == 400
+
+    def test_delete_item(self, client):
+        with client.app_context():
+            app = client.test_client()
+            populate_test_db(db)
+            resp = app.delete(self.RESOURCE_URL + "User1/1/")
+            assert resp.status_code == 204
+
+            resp = app.delete(self.RESOURCE_URL + "User2/1")
+            assert resp.status_code == 404
+           
+class TestPlaylistResource(object):
+    RESOURCE_URL = "/api/playlist/"
+    valid_data = {'name': 'officiis ipsum, Lorem', 'created_at':  "1973-01-04T22:23:29+00:00" }
+    invalid_data = {'name': 'officiis ipsum, Lorem'}
+    @pytest.mark.usefixtures("client")
+    def test_get_collection(self, client):
+        with client.app_context():
+            app = client.test_client()
+            populate_test_db(db)
+            resp = app.get(self.RESOURCE_URL + "User1/")
+            assert resp.status_code == 200
+            body = json.loads(resp.data)
+            check_namespace(app,body)
+            for item in body["items"]:
+                check_control_get_method(app,"self",item,200)
+
+            check_control_post_method(app,"plm:add-playlist", body)
+
+    def test_post_collection(self, client):
+        with client.app_context():
+            app = client.test_client()
+            populate_test_db(db)
+            resp = app.post(self.RESOURCE_URL + "User1/",data=json.dumps(self.valid_data))
+            assert resp.status_code == 415
+
+            resp = app.post(self.RESOURCE_URL + "User1/", json=self.valid_data)
+            assert resp.status_code == 201
+            resp = app.get(resp.headers.get("location"))
+            assert resp.status_code == 200
+
+            resp = app.post(self.RESOURCE_URL + "User1/", json=self.invalid_data)
+            assert resp.status_code == 400
+
+    def test_get_item(self, client):
+        with client.app_context():
+            app = client.test_client()
+            populate_test_db(db)
+
+            resp = app.get(self.RESOURCE_URL + "User1/10/")
+            assert resp.status_code == 404
+            resp = app.get(self.RESOURCE_URL + "User1/1/")
+            assert resp.status_code == 200
+            
+            body = json.loads(resp.data)
+            check_namespace(app,body)
+            check_control_get_method(app,"profile", body, 302)
+            check_control_get_method(app,"collection", body)
+            check_control_get_method(app,"self", body)
+
+            check_control_put_method(app,"plm:edit-playlist", body)
+            
+            resp = app.get(self.RESOURCE_URL + "User1/2/")
+            body = json.loads(resp.data)
+            check_control_delete_method(app,"plm:delete", body)
+
+            resp = app.get(self.RESOURCE_URL + "User3/3/")
+            assert resp.status_code == 409
+
+
+    def test_put_item(self, client):
+        with client.app_context():
+            app = client.test_client()
+            populate_test_db(db)
+
+            resp = app.put(self.RESOURCE_URL + "User1/1/",data=json.dumps(self.valid_data))
+            assert resp.status_code == 415
+            resp = app.put(self.RESOURCE_URL + "User1/1/",json=self.valid_data)
+            assert resp.status_code == 301
+            resp = app.get(resp.headers.get("location"))
+            assert resp.status_code == 200
+            
+            self.valid_data["created_at"] = "Not date time"
+            resp = app.put(self.RESOURCE_URL + "User1/2/",json=self.valid_data)
+            assert resp.status_code == 400
+
+            resp = app.put(self.RESOURCE_URL + "User1/2/",json=self.invalid_data)
+            assert resp.status_code == 400
+
+    def test_delete_item(self, client):
+        with client.app_context():
+            app = client.test_client()
+            populate_test_db(db)
+            resp = app.delete(self.RESOURCE_URL + "User1/1/")
+            assert resp.status_code == 204
+
+            resp = app.delete(self.RESOURCE_URL + "User2/1")
+            assert resp.status_code == 404
 #TODO: do same thing for 3 other resource.
 
 def check_namespace(client, body):
@@ -181,7 +356,6 @@ def check_control_put_method(client, ctrl, obj, api_key = "", expect_code = 301)
         "Content-Type": "application/json; charset=utf-8;",
         "authenticate_key": api_key
     }
-
     resp = client.put(href, headers = headers,json=body)
     assert resp.status_code == expect_code
 
