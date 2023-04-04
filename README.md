@@ -1,14 +1,36 @@
 # PWP-project
  The PWP project oulu course
  
- ## Set up instructions:
- Set up env (window shell)
+
+# Preface
+
+The GameScoreService API is developed under Python 3.9.x and it's recommended to have at least Python 3.3 to have the necessary tools included. The API uses SQLite 3 database engine and Flask framework with SQLAlchemy toolkit.
+
+The instructions shown in this file apply on Linux based environments.
+
+# Set up instructions:
+Set up env (window shell)
  ```console
  venv/Scripts/activate
  pip install -r requirements.txt
  $env:FLASK_APP = "playlistmanager"
  ```
  
+
+# Preparations
+Set up virtual environment (window shell)
+ ```console
+ py -3 -m venv venv
+ venv/Scripts/activate
+ $env:FLASK_APP = "playlistmanager"
+ ```
+
+# Installation
+Exact requirements are listed in the requirements.txt file, which can be given to the pip command:  
+```pip install -r requirements.txt```
+
+# Running
+
  If no database created yet
  ```console
  flask init-db
@@ -17,34 +39,32 @@
  ```console
  flask populate-db
  ```
- Run all test
- ```console
- python -m py.test
- python -m py.test --cov-report term-missing --cov=playlistmanager
- ```
+ 
  Run the project
  ```console
  flask run
  ```
-## Project Database Instructions:
+# Enrty Point
 
-There are playlist management database models class named 'Playlist', 'PlaylistTrack', 'Track' and 'User'. 
+The API is available at /api/ URI on the system you run it. By default it opens in the port 5000.
+```http://localhost:5000/api/```
 
-The Playlist model represents a playlist, with a foreign key to the User model, which contains the user's personal information. 
+You can access swagger UI.
+```http://localhost:5000/```
 
-The Track model represents a track, with fields for the name, artist, and duration of the track. The PlaylistTrack model represents the relationship between a playlist and a track, with foreign keys to the Playlist, Track, and User models, representing the playlist the track is in, the track itself, and the user who added the track to the playlist, respectively. 
+# Testing
 
-The dependencies of the project are provided in the file requirements.txt. 
-
-The main database engine used in the project is SQLite, we interact with the database using the Flask SQLAlchemy toolkit.
-
-the user can populate the database using the flask shell or the existing tests in the app.py file, using the shell as the following example:
-
-
-```console
->>> from models import db, User
->>> User_John = User(user_name='john97', password='john1997')
->>> db.session.add(User_John)
->>> db.session.commit()
+Execute the following lines when virtual environment is active:  
 ```
- a test is also included in unittest.py
+pip install pytest
+pip install pytest-cov
+```
+
+To run all the test. Use the following command
+```
+python -m py.test
+```
+With more detailed coverage reports.
+```
+python -m py.test --cov-report term-missing --cov=playlistmanager
+```
