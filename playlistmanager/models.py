@@ -45,7 +45,7 @@ class User(db.Model):
         props["user_name"] = {
             "description": "User's name",
             "type": "string",
-            "pattern": "^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$"
+            # "pattern": "^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$"
         }
         props["password"] = {
             "description": "User's password",

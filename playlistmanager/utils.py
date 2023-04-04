@@ -251,7 +251,7 @@ class RespondBodyBuilder(MasonBuilder):
         """
 
         self.add_control(
-            NAMESPACE_SHORT + "delete",
+            NAMESPACE_SHORT + ":delete",
             href=href,
             method="DELETE",
             title="Delete this resource"
@@ -291,7 +291,8 @@ def require_admin(func):
             db_key = AuthenticateKey.query.filter_by(admin=True).first()
             if secrets.compare_digest(key_hash, db_key.key):
                 return func(*args, **kwargs)
-            raise Forbidden
+            else:
+                raise Forbidden
         except:
             raise Forbidden
     return wrapper
@@ -301,9 +302,10 @@ def require_user_key(func):
         try:
             key_hash = AuthenticateKey.key_hash(request.headers.get("authenticate_key").strip())
             db_key = AuthenticateKey.query.filter_by(user=user).first()
-            if db_key is not None and secrets.compare_digest(key_hash, db_key.key):
-                return func(*args, **kwargs)
-            raise Forbidden
-        except:
+            if secrets.compare_digest(key_hash, db_key.key):
+                return func(self, user,*args, **kwargs)
+            else:
+                raise Forbidden
+        except Exception as e:
             raise Forbidden
     return wrapper
