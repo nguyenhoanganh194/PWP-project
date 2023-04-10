@@ -6,8 +6,6 @@
 
 The API is developed under Python 3.9.x and it's recommended to have at least Python 3.3 to have the necessary tools included. The API uses SQLite 3 database engine and Flask framework with SQLAlchemy toolkit.
 
-The instructions shown in this file apply on Linux based environments.
-
 # Set up instructions:
 Set up env (window shell)
  ```console
