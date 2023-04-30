@@ -298,6 +298,95 @@ def populate_db_command():
                 user=user[i],
             )
             db.session.add(key[i])
+
+
+        """
+        populating the db for the client 
+
+        """
+
+        user_list=['ali','nguyen']
+        for i in range(0, 2):
+            user[i+5] = User(
+                user_name=user_list[i],
+                password="password_{}".format(user_list[i]),
+            )   
+            db.session.add(user[i+5]) 
+
+        playlist_list=['chillmusic','workoutmusic','studymusic','partymusic','sadmusic','classicalmusic']
+        user_playlist={}
+        for i in range(0, 3):    
+            user_playlist[i] = Playlist(
+                name=playlist_list[i],
+                created_at = datetime.now(),
+                user = user[5]
+            )
+            user_playlist[i+3] = Playlist(
+                name=playlist_list[i+3],
+                created_at = datetime.now(),
+                user = user[6]
+            )    
+            db.session.add(user_playlist[i])
+            db.session.add(user_playlist[i+3])
+
+        track_list_names=['Ayahuasca','sailway','Goosebumps','world hold on','rememberance','lost at sea','mood','world holdon','moon','heartless','rememberance','open']
+        track_list_artists=['Vancouver Sleep Clinic','aimless','Travis Scott','bob sinclar','elfrieda','woods','makar','bob sinclar','kanye west','kanye west','elfrieda','coeur']
+        user_tracks = {}
+        for i in range(0, 6):
+            user_tracks[i] = Track(
+                name=track_list_names[i],
+                artist =track_list_artists[i],
+                duration = 100*i,
+                user = user[5]
+            )
+            user_tracks[i+6] = Track(
+                name=track_list_names[i+6],
+                artist =track_list_artists[i+6],
+                duration = 100*i,
+                user = user[6]
+            )
+            db.session.add(user_tracks[i])
+            db.session.add(user_tracks[i+6])
+
+
+        user_playlist_track = {}
+        j=0
+        for i in range(0, 3):
+            for k in range(0,2):
+                user_playlist_track[j+k] = PlaylistTrack(
+                        track_number= i+j,
+                        playlist =user_playlist[i],
+                        track = user_tracks[j+k]
+                    )
+                db.session.add(user_playlist_track[j+k])
+            j=j+2
+        
+        j=6
+        for i in range(3, 6):
+            for k in range(0,2):
+                user_playlist_track[j+k] = PlaylistTrack(
+                        track_number= i+j,
+                        playlist =user_playlist[i],
+                        track = user_tracks[j+k]
+                    )
+                db.session.add(user_playlist_track[j+k])
+            j=j+2
+            
+
+        
+        key5 = AuthenticateKey(
+                key=AuthenticateKey.key_hash("ali"),
+                admin = False,
+                user=user[5],
+            )
+        key6 = AuthenticateKey(
+                key=AuthenticateKey.key_hash("nguyen"),
+                admin = False,
+                user=user[6],
+            )
+        db.session.add(key5)
+        db.session.add(key6)
+
         db.session.commit()
     except IntegrityError:
         print("Failed to populate the database. Database must be empty.")

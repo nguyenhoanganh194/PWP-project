@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <title>Playlist Generator</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='images/Headphone.ico') }}">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="../static/css/site.css">
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+</head>
+<body>
+  <nav class="navbar navbar-dark bg-dark">
+    <a style="color: white;" class="navbar-brand" href="{{ url_for('landing') }}"> <small>Home</small><span class="sr-only">(current)</span></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  </nav>
+
+<div class="jumbotron text-center">
+  <h1>Music API Wrapped</h1> <span class="badge badge-warning">PWP Course Project</span>
+</div>
+
+<div class="container">
+
+  <div class="row mt-4 justify-content-center">
+
+    <div class="col-md-5">
+        <h3 style="text-align:center;">Your Analysis</h3>
+        <hr/>
+        <div class="container d-flex justify-content-center">
+            <div class="row">
+                <div class="col-sm">
+                    <div class="table-responsive">
+                      <table class="table table-hover table-sm">
+                        <tbody>
+                          <h4 style="color: goldenrod;text-align:center">Most played tracks </h4>
+                          {% for entry in userdata %}
+                          <tr>
+                            <td style="color:whitesmoke; text-align:left">{{entry[0]}} <br> <strong><sub>by: {{ entry[1] }} | Duration {{ entry[2] }} |</sub></strong> </td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                  </table>
+                    </div>
+                </div>
+            </div>
+        </div> 
+            <button type="button" id="list-tracks" class="btn btn-block btn-success btn-lg">Lets see what {{users[1]}} listens to</button>
+
+          
+          <br>
+    </div>
+
+    <script type="text/javascript">
+      document.addEventListener("DOMContentLoaded", () => {
+
+        const toggleTracks = document.querySelector(".toggle-tracks")
+        if (toggleTracks.classList.contains("toggle-tracks")){
+          toggleTracks.style.display="none"
+        }
+
+        const buttonTracks = document.querySelector("#list-tracks")
+
+        buttonTracks.addEventListener("click", () => {
+          if (toggleTracks.classList.contains("toggle-tracks")){
+            toggleTracks.style.display="block"
+          }
+        })
+      })
+    </script>
+
+    <div class="col-md-5 border-left toggle-tracks" id="tracks-col">
+        <h3 style="text-align:center;">{{users[1]}} Analysis</h3>
+        <hr/>
+        <div class="container d-flex justify-content-center">
+            <div class="row">
+                <div class="col-sm">
+                    <div class="table-responsive">
+                      <table class="table table-hover table-sm">
+                        <tbody>
+                          <h4 style="color: goldenrod;text-align:center">Most played tracks </h4>
+                          {% for entry in match_data %}
+                          <tr>
+                            <td style="color:whitesmoke; text-align:left">{{entry[0]}} <br> <strong><sub>by: {{ entry[1] }} | Duration {{ entry[2] }} |</sub></strong> </td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                  </table>
+                    </div>
+                </div>
+            </div>
+        </div> 
+        
+
+        <form action="{{ url_for('matching') }}">    
+            <button type="submit" formmethod="post" class="btn btn-block btn-success btn-lg">Generate the matching score</button>   
+          </form>
+        
+    </div>
+</div>
+
+<br>
+
+</body>
+</html>
+

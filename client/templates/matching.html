@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Matching results</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/Headphone.ico') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/matching.css">
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <a style="color: white;" class="navbar-brand" href="{{ url_for('landing') }}"> <small>Home</small><span class="sr-only">(current)</span></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </nav>
+
+
+      <div class="dcard">
+        <div class="trigger"></div>
+        <div class="trigger"></div>
+        <div class="trigger"></div>
+        <div class="trigger"></div>
+        <div class="trigger"></div>
+        <div class="trigger"></div>
+        <div class="trigger"></div>
+        <div class="trigger"></div>
+        <div class="trigger"></div>
+        
+    <div class="card">
+  
+        <p>Thank you for</p>
+        <p>Using our client.</p>
+        <p>Ready for your</p>
+        <p>Match score?</p>
+        
+        <p class="underline">You have a {{percent}} % matching music taste<br>you both like listening to</p>  
+        <br>
+        {% for entry in data %}
+       <p class="underline2">{{entry[0]}} by: {{ entry[1] }}</p>
+        {% endfor %}
+
+    </div>
+    </div>
+
+              
+  
+      
+  
+    
+</body>
+</html>

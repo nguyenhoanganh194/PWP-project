@@ -34,6 +34,7 @@ class UserCollection(Resource):
             item = RespondBodyBuilder()
             item.add_control("self", url_for("api.useritem", user=db_entry))
             item.add_control("profile", USER_PROFILE)
+            item.add_control("name", db_entry.user_name)
             body["items"].append(item)
         return Response(json.dumps(body), 200, mimetype=MASON)
     

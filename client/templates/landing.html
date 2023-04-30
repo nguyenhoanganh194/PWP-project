@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <title>Music API Wrapped</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='images/Headphone.ico') }}">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="../static/css/site.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+  <div class="jumbotron text-center">
+    <h1>Music API Wrapped</h1> <span class="badge badge-warning">PWP Course Project</span>
+  </div>
+    
+  <div class="container">    
+    <div class="row mt-4 justify-content-center">
+      <div class="col-md-5"> 
+        <h2>Find out if you share love for the same music</h2>
+        <br>
+        <div>
+          <p>Here is what you need to do:</p>
+        </div>
+          <ol>
+            <li>Enter your username.</li>
+            <li>Enter the username of who you want to match with.</li>
+            <li>Click on start analyzing and wait for the fun to start.</li>
+          <ol>
+          </div>
+        </div>
+      </div>
+  <form action="{{ url_for('playlists') }}">    
+    <div class="container">
+      <div class="row mt-4 justify-content-center">
+        <div class="col-md-5">
+          <div class="mb-3">
+            <label for="usernameinput" class="form-label">Your Username: </label>
+            <input type="text" class="form-control" id="usernameinput" name="username" placeholder="user" required>
+          </div>
+          <div class="mb-3">
+            <label for="secondusernameinput" class="form-label">Match With User: </label>
+            <input type="text" class="form-control" id="secondusernameinput" name="matchinguser" placeholder="user" required>
+          </div>
+            <button type="submit" formmethod="post" class="btn btn-block btn-success btn-lg">Start Analyzing My Music</button>   
+        </div>
+        
+      </div>
+    </div>
+  </form>
+
+
+</body>
+</html>

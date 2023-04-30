@@ -1,0 +1,83 @@
+html, body {
+    color: white;
+    background-image: url(../images/structure.png);
+    background-size:     cover;
+}
+
+body {padding: 0px; margin: 0;}
+* {transition: all 1s cubic-bezier(.25,.8,.25,1); 
+font-family: 'Montserrat', sans-serif;
+}
+
+
+.card {width: 100%; display: block;border: 0px solid;
+transform-style: preserve-3d; height: 0vh;
+   //transition-delay: 0.25s;
+}
+
+
+.dcard {position: relative; display: block;border-color: transparent;
+  height: 60vh;
+    width: 100vw;
+ perspective: 800px;
+}
+
+p {color: #fff;   border-color: transparent;
+ width: 60%; display: block; margin: 0 auto;
+  font-size: 70px;
+  text-align: right; font-weight: bold;
+}
+p:nth-child(odd) {
+ text-align: left;
+  transform: translateZ(70px); position: relative;
+}
+
+p:nth-child(1) {
+  color: #d3f971;
+}
+p:nth-child(2) {
+  color: #4b917d;
+}
+p:nth-child(3) {
+  color: #fff;
+}
+p:nth-child(4) {
+  color: #ee209c;
+}
+
+
+p.underline {font-size: 20px; text-align: center; margin-top: 20px; color: #d3f971;}
+p.underline2 {font-size: 20px; text-align: center; margin-top: 30px; color: #fff;}
+
+.trigger {position: absolute; height: 33.333333%; width: 33.333333%; display: block; z-index: 2; 
+
+  &:nth-child(1){  left: 0%; top: 0%;
+    &:hover ~ .card {transform: rotateY(8deg) rotateX(-5deg);}
+   }
+  &:nth-child(2){  left: 33.333333%; top: 0%;
+    &:hover ~ .card {transform: rotateY(0deg) rotateX(-5deg);;}
+   }
+  &:nth-child(3){  left: 66.666666%; top: 0%;
+    &:hover ~ .card {transform: rotateY(-8deg) rotateX(-5deg);}
+   }
+  &:nth-child(4){  left: 0%; top: 33.333333%;
+    &:hover ~ .card {transform: rotateY(8deg);}
+   }
+  &:nth-child(5){  left: 33.333333%; top: 33.333333%;
+    &:hover ~ .card {transform: rotateY(0deg) rotateX(0deg);}
+   }
+  &:nth-child(6){  left: 66.666666%; top: 33.333333%;
+    &:hover ~ .card {transform: rotateY(-8deg) rotateX(0deg);}
+   }
+  &:nth-child(7){  left: 0%; top: 66.666666%;
+    &:hover ~ .card {transform: rotateY(8deg) rotateX(5deg);}
+   }
+  &:nth-child(8){  left: 33.333333%; top: 66.666666%;
+    &:hover ~ .card {transform: rotateY(0deg) rotateX(5deg);}
+   }
+  &:nth-child(9){  left: 66.666666%; top: 66.666666%;
+    &:hover ~ .card {transform: rotateY(-8deg) rotateX(5deg);}
+   }
+}
+
+
