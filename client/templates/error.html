@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Matching results</title>
+    <title>Final</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/Headphone.ico') }}">
@@ -27,40 +27,18 @@
         
     <div class="card">
   
-        <p>Thank you for</p>
-        <p>Using our client.</p>
-        <p>Ready for your</p>
-        <p>Match score?</p>
+        <p>looks like there</p>
+        <p>is a mistake.</p>
+        <p>can you please go back</p>
+        <p>and check user names</p>
         
-        <p class="underline">You have a {{percent}} % matching music taste<br>you both like listening to</p>  
-        <br>
-        {% for entry in data %}
-       <p class="underline2">{{entry[0]}} by: {{ entry[1] }}</p>
-        {% endfor %}
-
-
 
         <br>
         <br>
           <a class="btn" href="{{ url_for('landing') }}" >Go back to Home page</a>
-          <br>
-          <a class="btn btn-ghost" href="{{ url_for('addtrack') }}" >Add some of {{users[1]}} tracks to your collection</a>        
+          <br>      
 
 
     </div>
 
     </div>
-  
-
-
-
-
-
-
-              
-  
-      
-  
-    
-</body>
-</html>
