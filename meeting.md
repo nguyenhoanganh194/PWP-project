@@ -5,7 +5,6 @@
 * **ASSISTANTS:**
 
 ### Minutes
-*Summary of what was discussed during the meeting*
 TODO:
 Idea need to be clear.
 The graph has to be how to API work.
@@ -20,9 +19,8 @@ The graph has to be how to API work.
 * **ASSISTANTS:**
 
 ### Minutes
-*Summary of what was discussed during the meeting*
-The idea is good now.
-Database relation ship is good.
+The idea is good now. \n
+Database relation ship is good.\n
 
 TODO: Need to include on delete relationship.
 ### Action points
