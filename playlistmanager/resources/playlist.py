@@ -29,6 +29,7 @@ class PlaylistCollection(Resource):
         body.add_namespace(NAMESPACE_SHORT, LINK_RELATIONS_URL)
         body.add_control("self", url_for("api.playlistcollection", user=user))
         body.add_control_add_playlist(user)
+        body.add_control("user",url_for("api.useritem", user = user))
         body["items"] = []
         for playlist in user.playlists:
             item = RespondBodyBuilder()

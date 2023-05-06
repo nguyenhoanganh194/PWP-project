@@ -29,6 +29,7 @@ class TrackCollection(Resource):
         body.add_namespace(NAMESPACE_SHORT, LINK_RELATIONS_URL)
         body.add_control("self", url_for("api.trackcollection", user = user))
         body.add_control_add_track(user)
+        body.add_control("user",url_for("api.useritem", user = user))
         body["items"] = []
         for track in user.tracks:
             item = RespondBodyBuilder()
