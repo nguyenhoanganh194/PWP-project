@@ -32,11 +32,7 @@
       <div class="col-md-5">
 
         <div class="mb-3">       
-
-
-
-        <label for="track-name">Track Name</label>
-        
+        <label for="track-name">Track Name</label>       
         <select class="form-control form-control-lg" id="track-name" name="track-name" select multiple>
           {% for entry in data %}
           <option value= {{entry[0]}} >{{entry[0]}}</option>
@@ -49,15 +45,10 @@
             <option value= {{entry[2]}} >{{entry[0]}}</option>
             {% endfor %}
           </select>
-
-
-
-
         </div>
 
           <button type="submit" formmethod="post" class="btn btn-block btn-success btn-lg">Add to Playlist</button>   
-      </div>
-      
+      </div>     
     </div>
   </div>
 </form>

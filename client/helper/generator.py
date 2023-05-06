@@ -1,5 +1,6 @@
 import difflib
 import json
+import requests 
 
 def playlist_tracks(s, playlist_track_href,SERVER_URL):
     data=[]
@@ -121,3 +122,18 @@ def add_track_to_playlist(s,locations,playlisthref,SERVER_URL):
             headers = {"Content-type": "application/json"}
         )
 
+def get_recommendations(user,SERVICE_URL):
+    with requests.Session() as s:
+        resp = s.get(SERVICE_URL + "/api/")
+        if resp.status_code != 200:
+            print("Unable to access API.")
+        else:
+            body = resp.json()
+            resp = s.get(SERVICE_URL + body['@controls']['lm:users-all']['href'])
+            body = resp.json()
+            for item in body['items']:                
+                if item['name'] == user:
+                    user_recommendation_href =item['@controls']['lm:RecommendationList']['href']
+            resp = s.get(SERVICE_URL + user_recommendation_href)
+            body = resp.json()
+    return body['items']

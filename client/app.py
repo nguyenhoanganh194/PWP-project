@@ -8,6 +8,7 @@ from threading import Thread
 import time
 
 SERVER_URL = "http://localhost:5000"
+SERVICE_URL = "http://localhost:3000"
 
 app = Flask(__name__)
 app.config["SESSION_TYPE"] = "filesystem"
@@ -15,9 +16,11 @@ Session(app)
 
 main_user_flag=0
 second_user_flag=0
+recommendations_flag = 0 
 main_user_data=[]
 second_user_data=[]
 main_user_playlists=[]
+recommendation_list=[]
 
 
 def threaded_task(matchinguser):
@@ -33,6 +36,14 @@ def threaded_task2(playlist_hrefs):
     global main_user_flag
     main_user_data=generator.playlist_tracks(s,playlist_hrefs,SERVER_URL)
     main_user_flag=1
+
+def service_task(user):  
+    global recommendations_flag 
+    global recommendation_list
+    recommendation_list= generator.get_recommendations(user,SERVICE_URL)
+    recommendations_flag=1
+
+
 
 # app
 @app.route('/', methods = ['GET', 'POST'])  #the main index entry point to our app 
@@ -61,14 +72,12 @@ def playlists():
         thread2.daemon = True
         thread2.start()
         session['users'] = [username,matchingusername]
-        session['tracks_href']= tracks_href
+        session['tracks_href'] = tracks_href
         session['playlist_hrefs']= [playlist_hrefs]
         return render_template('playlists.html',data=main_user_playlists)
 
 @app.route('/tracks', methods = ['GET', 'POST'])  
 def tracks():
-    global main_user_data
-    global second_user_data
     global main_user_flag
     global second_user_flag
 
@@ -76,14 +85,19 @@ def tracks():
         pass
     main_user_flag = 0
     second_user_flag = 0
+    
+    users =session.get('users')
+    thread = Thread(target=service_task, args=(users[0],))
+    thread.daemon = True
+    thread.start()    
 
-    return render_template('tracks.html',userdata=main_user_data,match_data=second_user_data,users=session.get('users'))
+    return render_template('tracks.html',userdata=main_user_data,match_data=second_user_data,users=users)
 
 @app.route('/matching', methods = ['GET', 'POST'])  
 def matching():
     results, percent = generator.match_tracks(main_user_data,second_user_data)
-    
-    return render_template('matching.html',data=results, percent = percent,users=session.get('users'))
+    users =session.get('users')
+    return render_template('matching.html',data=results, percent = percent,users=users)
 
 @app.route('/addtrack', methods = ['GET', 'POST'])  
 def addtrack(): 
@@ -104,13 +118,20 @@ def tracksuccess():
     locations =[]
     for item in trackdata:
         response = generator.add_track(s,ctrl,item,SERVER_URL)
-        print(response)
         locations.append(response)
 
     generator.add_track_to_playlist(s,locations,playlisthref,SERVER_URL)
 
     return render_template('final.html')
 
+
+@app.route('/recommendations', methods = ['GET', 'POST'])  
+def recommendations(): 
+    global recommendations_flag
+    while recommendations_flag !=1:
+        pass
+    recommendations_flag = 0
+    return render_template('recommendations.html',data=recommendation_list)
 
 if __name__ == '__main__':
     with requests.Session() as s:
@@ -119,6 +140,5 @@ if __name__ == '__main__':
         print("Unable to access API.")
     else:
         body = resp.json()
-        print(body)
     app.run(debug=True, port=8080)
 
