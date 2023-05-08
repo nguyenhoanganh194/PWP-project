@@ -93,3 +93,11 @@ if you followed the previous instructions carefully, you now have:
 * The Client Application running on ```http://localhost:8080/```
 
 
+
+The static CSS files, background image, (very limited html snippets) for the client are not purely my original work, they drew a large inspiration from multiple sources combined together:
+* https://codepen.io/sirnightowl/pen/qBENNyW
+* https://dev.to/themodernweb/how-to-create-music-player-with-pure-html-css-js-34lc
+* https://github.com/marwonn/spotify-playlist-generator-analyzer
+* https://www.free-css.com/free-css-templates/page91/musicshow
+
+
