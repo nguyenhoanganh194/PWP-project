@@ -66,3 +66,30 @@ With more detailed coverage reports.
 ```
 python -m py.test --cov-report term-missing --cov=playlistmanager
 ```
+
+
+# The Client
+
+first move to the service folder directory, you can either set up an environment or install the dependencies directly on your machine using the command:
+
+ ```console
+pip install -r requirements.txt
+ ```
+all you need to run the service is the following command:
+
+ ```console
+python app.py
+ ```
+
+now you can move to the client directory, you can use the same virtual environment and run the command
+
+ ```console
+python app.py
+ ```
+
+if you followed the previous instructions carefully, you now have:
+* The Main API running on ```http://localhost:5000/```
+* The Auxiliary service running on ```http://localhost:3000/```
+* The Client Application running on ```http://localhost:8080/```
+
+
