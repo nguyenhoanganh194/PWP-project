@@ -329,8 +329,8 @@ def populate_db_command():
             db.session.add(user_playlist[i])
             db.session.add(user_playlist[i+3])
 
-        track_list_names=['Ayahuasca','sailway','Goosebumps','world hold on','rememberance','lost at sea','mood','world holdon','moon','heartless','rememberance','open']
-        track_list_artists=['Vancouver Sleep Clinic','aimless','Travis Scott','bob sinclar','elfrieda','woods','makar','bob sinclar','kanye west','kanye west','elfrieda','coeur']
+        track_list_names=['Ayahuasca','sailway','escape plan','world hold on','rememberance','Better','mood','world holdon','moon','heartless','rememberance','open']
+        track_list_artists=['Vancouver Sleep Clinic','aimless','Travis Scott','bob sinclar','elfrieda','Khalid','makar','bob sinclar','kanye west','kanye west','elfrieda','coeur']
         user_tracks = {}
         for i in range(0, 6):
             user_tracks[i] = Track(
