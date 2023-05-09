@@ -29,6 +29,10 @@ data['Artist Name'] = data['Artist Name'].str.strip()
 
 
 def get_users():
+    """
+    a function used to aget the URI of User Collection of main API
+    output: returns a list of users data from the main API
+    """
     with requests.Session() as s:
         resp = s.get(Main_API_SERVER + "/api/")
         if resp.status_code != 200:
@@ -44,6 +48,11 @@ def get_users():
             return hits
         
 def get_href(user):
+    """
+    a function used to get the URI of a specifi user
+    input params:user name
+    output: returns the user URI
+    """
     with requests.Session() as s:
         resp = s.get(Main_API_SERVER + "/api/")
         if resp.status_code != 200:
@@ -60,6 +69,11 @@ def get_href(user):
             return s, hits[0]["@controls"]["self"]["href"]
 
 def get_track_data(s, user_href):
+    """
+    a function used to extract all the tracks of a user
+    input params:session, user URI 
+    output: returns a list of artist names listed to by the user
+    """
     resp = s.get(Main_API_SERVER + user_href)
     body = resp.json()
     tracks_href=body["@controls"]["plm:tracks-of"]["href"]
@@ -74,9 +88,14 @@ def get_track_data(s, user_href):
         tracks.append(body["item"]["name"])
         artists.append(body["item"]["artist"])
 
-    return artists, list
+    return artists, tracks
 
 def get_recommendations(artists):
+    """
+    a function used to generate recommendations based on artists names
+    input params:a list of artists names 
+    output: returns a list of artist music recommendations
+    """
     recommendations = []
     for artist in artists:
         i=data[data['Artist Name']==artist]
@@ -94,6 +113,11 @@ def get_recommendations(artists):
 
         
 class RecommendationList(Resource):
+    """
+    The RecommendationList resource supports GET methods.
+    Possible response codes:
+    200 with a successful GET
+    """
     def get(self,user):
         s, user_href=get_href(user)
         artists, tracks=get_track_data(s, user_href)
@@ -107,6 +131,11 @@ class RecommendationList(Resource):
 
 
 class UserCollection(Resource):
+    """
+    The UserCollection resource supports GET methods.
+    Possible response codes:
+    200 with a successful GET
+    """
 
     def get(self):
         api_data=get_users()
@@ -195,6 +224,9 @@ api.add_resource(UserCollection, "/api/users/")
 
 @app.route("/api/")
 def entry():
+    """
+    the main and only entry point to our service
+    """
     resp_data = MasonBuilder()
     resp_data.add_namespace(NAMESPACE_SHORT, LINK_RELATIONS_URL)
     resp_data.add_control(

@@ -1,3 +1,10 @@
+
+/* the landing page css extensions is mostly taken from:
+https://dev.to/themodernweb/how-to-create-music-player-with-pure-html-css-js-34lc
+https://github.com/marwonn/spotify-playlist-generator-analyzer
+https://webkit.org/css-status/# 
+https://developer.mozilla.org/en-US/docs/Web/CSS/WebKit_Extensions
+*/
 html, body {
     color: white;
     background-image: url(../images/structure.png);
@@ -9,9 +16,9 @@ html, body {
 }
 
 input[type=range] {
-    -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
-    width: 100%; /* Specific width is required for Firefox. */
-    background: transparent; /* Otherwise white in Chrome */
+    -webkit-appearance: none; /* Hides the slider */
+    width: 100%; 
+    background: transparent; 
   }
   
   input[type=range]::-webkit-slider-thumb {
@@ -19,14 +26,13 @@ input[type=range] {
   }
   
   input[type=range]:focus {
-    outline: none; /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
+    outline: none; /* Removes the blue border */
   }
   
   input[type=range]::-ms-track {
     width: 100%;
     cursor: pointer;
   
-    /* Hides the slider so custom styles can be added */
     background: transparent; 
     border-color: transparent;
     color: transparent;
@@ -122,17 +128,16 @@ input[type=range]::-webkit-slider-thumb {
    /* Landing Page CSS */
 
    #typewriter {
-    overflow: hidden; /* Ensures the content is not revealed until the animation */
-    border-right: .80em solid white; /* The typwriter cursor */
-    white-space: nowrap; /* Keeps the content on a single line */
-    margin: 0 auto; /* Gives that scrolling effect as the typing happens */
-    letter-spacing: .15em; /* Adjust as needed */
+    overflow: hidden; 
+    border-right: .80em solid white; 
+    white-space: nowrap; 
+    margin: 0 auto; 
+    letter-spacing: .15em; 
     animation: 
       typing 3.5s steps(40, end),
-      blink-caret .99s step-end 10;  /*oder 'infinite' */
+      blink-caret .99s step-end 10;  
   }
   
-  /* The typing effect */
   @keyframes typing {
     from { width: 0 }
     to { width: 100% }
