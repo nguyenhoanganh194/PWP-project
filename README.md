@@ -7,25 +7,20 @@
 The API is developed under Python 3.9.x and it's recommended to have at least Python 3.3 to have the necessary tools included. The API uses SQLite 3 database engine and Flask framework with SQLAlchemy toolkit.
 
 # Set up instructions:
-Set up env (window shell)
+Set up the project.(window shell)
  ```console
+ py -3 -m venv venv
  venv/Scripts/activate
  pip install -r requirements.txt
- $env:FLASK_APP = "playlistmanager"
  ```
  
 
 # Preparations
 Set up virtual environment (window shell)
  ```console
- py -3 -m venv venv
  venv/Scripts/activate
  $env:FLASK_APP = "playlistmanager"
  ```
-
-# Installation
-Exact requirements are listed in the requirements.txt file, which can be given to the pip command:  
-```pip install -r requirements.txt```
 
 # Running
 
@@ -33,7 +28,7 @@ Exact requirements are listed in the requirements.txt file, which can be given t
  ```console
  flask init-db
  ```
- If create some fake data
+ If you want to create some fake data
  ```console
  flask populate-db
  ```
@@ -91,5 +86,13 @@ if you followed the previous instructions carefully, you now have:
 * The Main API running on ```http://localhost:5000/```
 * The Auxiliary service running on ```http://localhost:3000/```
 * The Client Application running on ```http://localhost:8080/```
+
+
+
+The static CSS files, background image, (very limited html snippets) for the client are not purely my original work, they drew a large inspiration from multiple sources combined together:
+* https://codepen.io/sirnightowl/pen/qBENNyW
+* https://dev.to/themodernweb/how-to-create-music-player-with-pure-html-css-js-34lc
+* https://github.com/marwonn/spotify-playlist-generator-analyzer
+* https://www.free-css.com/free-css-templates/page91/musicshow
 
 
