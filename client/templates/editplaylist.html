@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <title>Playlist Generator</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='images/Headphone.ico') }}">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="../static/css/site.css">  
+</head>
+<body>
+  <nav class="navbar navbar-dark bg-dark">
+    <a style="color: white;" class="navbar-brand" href="{{ url_for('landing') }}"> <small>Home</small><span class="sr-only">(current)</span></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  </nav>
+
+<div class="jumbotron text-center">
+  <h1>Music API Wrapped</h1> <span class="badge badge-warning">PWP Course Project</span>
+</div>
+
+<form action="{{ url_for('editsuccess') }}">    
+<div class="container">
+
+  <div class="row mt-4 justify-content-center">
+
+      <div class="col-md-5">
+        <h3 style="text-align:center;">Edit Your Playlists</h3>
+        <hr/>
+          <div class="container d-flex justify-content-center">
+            <div class="row">
+              <div class="col-sm">                     
+                <label for="playlist-delete">Choose a playlist to delete</label>       
+                <select class="form-control form-control-lg" id="playlist-delete" name="playlist-delete">
+                <option value= '' ></option>
+                {% for entry in data %}
+                <option value= {{entry[2]}} >{{entry[0]}}</option>
+                {% endfor %}
+                </select>
+            
+                <label for="playlist-edit">Choose a playlist to edit</label>       
+                <select class="form-control form-control-lg" id="playlist-edit" name="playlist-edit">
+                <option value= '' ></option>
+                {% for entry in data %}
+                <option value= {{entry[2]}} >{{entry[0]}}</option>
+                {% endfor %}
+                </select>
+
+                <label for="playlistname" class="form-label">New Playlist Name: </label>
+                <input type="text" class="form-control" id="playlistname" name="playlistname" placeholder="new playlist">
+              </div>
+            </div>
+          </div> 
+      </div>
+
+    <div class="col-md-5 border-left toggle-tracks" id="tracks-col">
+        <h3 style="text-align:center;">Edit Your Tracks</h3>
+        <hr/>
+        <div class="container d-flex justify-content-center">
+            <div class="row">
+                <div class="col-sm">                     
+                  <label for="track-delete">Choose a Track to delete</label>       
+                  <select class="form-control form-control-lg" id="track-delete" name="track-delete">
+                  <option value= '' ></option>
+                  {% for entry in trackdata %}
+                  <option value= {{entry[3]}} >{{entry[0]}}</option>
+                  {% endfor %}
+                  </select>
+  
+
+                </div>
+            </div>
+        </div> 
+        
+
+
+            
+
+        
+    </div>
+</div>
+<div class="row mt-4 justify-content-center">
+<div class="col-md-5">
+<button type="submit" formmethod="post" class="btn btn-block btn-success btn-lg">Apply Edits</button>   
+</div>
+</div>
+</form>
+
+
+
+</body>
+</html>
+

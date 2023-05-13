@@ -84,17 +84,12 @@ class Playlist(db.Model):
     def get_schema():
         schema = {
             "type": "object",
-            "required": ["name", "created_at"]
+            "required": ["name"]
         }
         props = schema["properties"] = {}
         props["name"] = {
             "description": "Playlist name",
             "type": "string",
-        }
-        props["created_at"] = {
-            "description": "Date time created",
-            "type": "string",
-            "format": "date-time"
         }
         return schema
 

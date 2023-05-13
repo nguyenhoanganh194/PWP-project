@@ -117,8 +117,7 @@ class PlaylistItem(Resource):
         status = 301
         playlist.deserialize(request.json)
         db.session.commit()
-        headers = {"Location": url_for("api.playlistitem", user = user, playlist = playlist)}
-        return Response(status=status, headers=headers)
+        return Response(status=status)
     
     def delete(self, user, playlist):
         """

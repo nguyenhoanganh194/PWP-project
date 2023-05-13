@@ -1,14 +1,7 @@
 import json
 import requests
-from datetime import datetime
-from flask import Flask, Response, request
-from flask.cli import with_appcontext
+from flask import Flask, Response
 from flask_restful import Resource, Api
-from werkzeug.exceptions import BadRequest, NotFound, ServiceUnavailable
-from sqlalchemy.engine import Engine
-from sqlalchemy import event
-from sqlalchemy.exc import IntegrityError, OperationalError
-import time
 import pandas as pd
 
 app = Flask(__name__)
@@ -16,7 +9,7 @@ api = Api(app)
 
 
 
-Main_API_SERVER="http://localhost:5000"
+MAIN_API_SERVER="http://localhost:5000"
 API_NAME = "lyricsmatcher"
 MASON = "application/vnd.mason+json"
 NAMESPACE_SHORT = "lm"
@@ -33,57 +26,59 @@ def get_users():
     a function used to aget the URI of User Collection of main API
     output: returns a list of users data from the main API
     """
-    with requests.Session() as s:
-        resp = s.get(Main_API_SERVER + "/api/")
+    with requests.Session() as session:
+        resp = session.get(MAIN_API_SERVER + "/api/")
         if resp.status_code != 200:
             print("Unable to access API.")
-        else:
-            body = resp.json()          
-            resp = s.get(Main_API_SERVER + body["@controls"]["plm:users-all"]["href"])
-            body = resp.json()
-            collection= body["items"]
-            hits = []
-            for item in collection:
-                hits.append(item["@controls"]["name"]["href"])
-            return hits
-        
+            return None
+
+        body = resp.json()
+        resp = session.get(MAIN_API_SERVER + body["@controls"]["plm:users-all"]["href"])
+        body = resp.json()
+        collection= body["items"]
+        hits = []
+        for item in collection:
+            hits.append(item["@controls"]["name"]["href"])
+        return hits
+
 def get_href(user):
     """
     a function used to get the URI of a specifi user
     input params:user name
     output: returns the user URI
     """
-    with requests.Session() as s:
-        resp = s.get(Main_API_SERVER + "/api/")
+    with requests.Session() as session:
+        resp = session.get(MAIN_API_SERVER + "/api/")
         if resp.status_code != 200:
             print("Unable to access API.")
-        else:
-            body = resp.json()          
-            resp = s.get(Main_API_SERVER + body["@controls"]["plm:users-all"]["href"])
-            body = resp.json()
-            collection= body["items"]
-            hits = []
-            for item in collection:
-                if item["@controls"]["name"]["href"] == user:
-                    hits.append(item)   
-            return s, hits[0]["@controls"]["self"]["href"]
+            return None
 
-def get_track_data(s, user_href):
+        body = resp.json()
+        resp = session.get(MAIN_API_SERVER + body["@controls"]["plm:users-all"]["href"])
+        body = resp.json()
+        collection= body["items"]
+        hits = []
+        for item in collection:
+            if item["@controls"]["name"]["href"] == user:
+                hits.append(item)
+        return session, hits[0]["@controls"]["self"]["href"]
+
+def get_track_data(session, user_href):
     """
     a function used to extract all the tracks of a user
     input params:session, user URI 
     output: returns a list of artist names listed to by the user
     """
-    resp = s.get(Main_API_SERVER + user_href)
+    resp = session.get(MAIN_API_SERVER + user_href)
     body = resp.json()
     tracks_href=body["@controls"]["plm:tracks-of"]["href"]
-    resp = s.get(Main_API_SERVER + tracks_href)
+    resp = session.get(MAIN_API_SERVER + tracks_href)
     body = resp.json()
     collection=body["items"]
     tracks=[]
     artists=[]
     for item in collection:
-        resp = s.get(Main_API_SERVER + item["@controls"]["self"]["href"])
+        resp = session.get(MAIN_API_SERVER + item["@controls"]["self"]["href"])
         body = resp.json()
         tracks.append(body["item"]["name"])
         artists.append(body["item"]["artist"])
@@ -104,14 +99,13 @@ def get_recommendations(artists):
             count=count*0.1
             round(count)
             count=int(count)
-            for x in range(0,count):
+            for counter in range(0,count):
                 recommended_track=[]
-                recommended_track.append(i['Artist Name'].values[x])
-                recommended_track.append(i['Song Name'].values[x])
+                recommended_track.append(i['Artist Name'].values[counter])
+                recommended_track.append(i['Song Name'].values[counter])
                 recommendations.append(recommended_track)
     return recommendations
 
-        
 class RecommendationList(Resource):
     """
     The RecommendationList resource supports GET methods.
@@ -119,8 +113,11 @@ class RecommendationList(Resource):
     200 with a successful GET
     """
     def get(self,user):
-        s, user_href=get_href(user)
-        artists, tracks=get_track_data(s, user_href)
+        """
+        return a list of recommended music
+        """
+        session, user_href=get_href(user)
+        artists, tracks=get_track_data(session, user_href)
         recommendations = get_recommendations(artists)
         body = MasonBuilder()
         body.add_namespace(NAMESPACE_SHORT, LINK_RELATIONS_URL)
@@ -138,6 +135,9 @@ class UserCollection(Resource):
     """
 
     def get(self):
+        """
+        return a list of user URIs
+        """
         api_data=get_users()
         resp_data = MasonBuilder(
             items=[]
@@ -182,7 +182,7 @@ class MasonBuilder(dict):
             "@messages": [details],
         }
 
-    def add_namespace(self, ns, uri):
+    def add_namespace(self, name_space, uri):
         """
         Adds a namespace element to the object. A namespace defines where our
         link relations are coming from. The URI can be an address where
@@ -195,7 +195,7 @@ class MasonBuilder(dict):
         if "@namespaces" not in self:
             self["@namespaces"] = {}
 
-        self["@namespaces"][ns] = {
+        self["@namespaces"][name_space] = {
             "name": uri
         }
 

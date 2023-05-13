@@ -1,6 +1,8 @@
+# pylint: disable=C0103
 import difflib
 import json
-import requests 
+import requests
+from datetime import datetime
 
 def playlist_tracks(s, playlist_track_href,SERVER_URL):
     """
@@ -8,12 +10,11 @@ def playlist_tracks(s, playlist_track_href,SERVER_URL):
     input params:session, playlisttrackitem URI name server url
     output: returns playlist track item data 
     """
-    
     data=[]
     for single_href in playlist_track_href:
         resp = s.get(SERVER_URL + single_href)
         body = resp.json()
-        collection=body["items"]        
+        collection=body["items"]
         for item in collection:
             track=[]
             resp = s.get(SERVER_URL + item["@controls"]["self"]["href"])
@@ -23,6 +24,7 @@ def playlist_tracks(s, playlist_track_href,SERVER_URL):
             track.append(body["item"]["name"])
             track.append(body["item"]["artist"])
             track.append(body["item"]["duration"])
+            track.append(body["@controls"]["self"]["href"])
             data.append(track)
     return data
 
@@ -52,8 +54,8 @@ def display_playlists(s,user_href,SERVER_URL):
         item_data.append(body["item"]["created_at"])
         item_data.append(body["@controls"]["self"]["href"])
         data.append(item_data)
-    
-    return data,playlist_hrefs,tracks_href 
+
+    return data,playlist_hrefs,tracks_href
 
 def find_user_href(name, collection):
     """
@@ -92,14 +94,14 @@ def match_tracks(main_user_data,second_user_data):
     output: returns a list of common tracks and percent of matching
     """
     list =[]
-    for main_user_item in main_user_data:      
+    for main_user_item in main_user_data:
         name=main_user_item[0]
         for second_user_item in second_user_data:
             seq = difflib.SequenceMatcher(None,name,second_user_item[0])
             if (seq.ratio()*100) >88:
                 list.append(main_user_item)
-                break 
-    percent = len(list)/len(main_user_data) *100         
+                break
+    percent = len(list)/len(main_user_data) *100
     return list, round(percent)
 
 
@@ -133,7 +135,7 @@ def add_track_to_playlist(s,locations,playlisthref,SERVER_URL):
         resp = s.get(SERVER_URL + item)
         body = resp.json()
         list.append(body["item"]["id"])
-    
+
     response = s.get(SERVER_URL + playlisthref)
     body = response.json()
     id = body["item"]["id"]
@@ -155,6 +157,22 @@ def add_track_to_playlist(s,locations,playlisthref,SERVER_URL):
             headers = {"Content-type": "application/json"}
         )
 
+def deleteplaylist(s,playlistlink,SERVER_URL):
+    resp = s.delete(SERVER_URL + playlistlink)
+    body = resp.status_code
+    return body
+
+def editplaylist(s,playlistname,playlistlink,SERVER_URL):
+    data={}
+    data["name"]=playlistname
+    data["created_at"]= datetime.now()
+    resp = s.request(
+        'PUT',
+        SERVER_URL +playlistlink,
+        data=json.dumps(data, default= str),
+        headers = {"Content-type": "application/json"}
+    )
+
 def get_recommendations(user,SERVICE_URL):
     """
     a function used to communicate with the service to get recommendations
@@ -169,9 +187,14 @@ def get_recommendations(user,SERVICE_URL):
             body = resp.json()
             resp = s.get(SERVICE_URL + body['@controls']['lm:users-all']['href'])
             body = resp.json()
-            for item in body['items']:                
+            for item in body['items']:
                 if item['name'] == user:
                     user_recommendation_href =item['@controls']['lm:RecommendationList']['href']
             resp = s.get(SERVICE_URL + user_recommendation_href)
             body = resp.json()
     return body['items']
+
+def deletetrack(s,trackdelete,SERVER_URL):
+    resp = s.delete(SERVER_URL + trackdelete)
+    body = resp.status_code
+    return body
